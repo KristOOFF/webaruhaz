@@ -44,8 +44,8 @@
     <select bind:value={milk} class="w-full text-sm rounded px-3 py-2 outline-none cursor-pointer appearance-none backdrop-blur-sm
       bg-white/40 focus:ring-2 focus:ring-white/50 text-white border border-white/30
       dark:bg-white/10 dark:focus:ring-purple-400/50 dark:text-white dark:border-white/20
-      [&>option]:bg-slate-600 [&>option]:text-white
-      dark:[&>option]:bg-gray-800 dark:[&>option]:text-gray-100">
+      [&>option]:bg-slate-700 [&>option]:text-gray-100
+      dark:[&>option]:bg-gray-900 dark:[&>option]:text-gray-100">
       <option value="Mandula tej">Mandula tej</option>
       <option value="Tehéntej">Tehéntej</option>
       <option value="Zabtej">Zabtej</option>
@@ -54,8 +54,8 @@
     <select bind:value={sugar} class="w-full text-sm rounded px-3 py-2 outline-none cursor-pointer appearance-none backdrop-blur-sm
       bg-white/40 focus:ring-2 focus:ring-white/50 text-white border border-white/30
       dark:bg-white/10 dark:focus:ring-purple-400/50 dark:text-white dark:border-white/20
-      [&>option]:bg-slate-600 [&>option]:text-white
-      dark:[&>option]:bg-gray-800 dark:[&>option]:text-gray-100">
+      [&>option]:bg-slate-700 [&>option]:text-gray-100
+      dark:[&>option]:bg-gray-900 dark:[&>option]:text-gray-100">
       <option value="Cukor mennyiség" disabled>Cukor mennyiség</option>
       <option value="Nincs">Nincs</option>
       <option value="1 kanál">1 kanál</option>
