@@ -85,3 +85,16 @@
     Kosárba
   </button>
 </div>
+
+<style>
+  /* Ensure dropdown options are always visible with proper contrast */
+  select option {
+    background-color: rgb(51 65 85); /* slate-700 */
+    color: rgb(243 244 246); /* gray-100 */
+  }
+
+  :global(.dark) select option {
+    background-color: rgb(17 24 39); /* gray-900 */
+    color: rgb(243 244 246); /* gray-100 */
+  }
+</style>
