@@ -31,6 +31,28 @@
       delay: Math.random() * 4
     });
   }
+
+  // Generate random clouds
+  interface Cloud {
+    x: number;
+    y: number;
+    size: number;
+    opacity: number;
+    delay: number;
+  }
+
+  const clouds: Cloud[] = [];
+  const cloudCount = 5;
+
+  for (let i = 0; i < cloudCount; i++) {
+    clouds.push({
+      x: Math.random() * 100,
+      y: Math.random() * 60, // Keep clouds in upper/middle portion
+      size: Math.random() * 60 + 40, // Size between 40 and 100
+      opacity: Math.random() * 0.3 + 0.3, // Opacity between 0.3 and 0.6
+      delay: Math.random() * 20
+    });
+  }
 </script>
 
 <!-- Main Container: Transition between Light and Dark -->
@@ -52,9 +74,15 @@
 
   <!-- Clouds (Light mode only) -->
   <div class="absolute inset-0 pointer-events-none transition-opacity duration-700 opacity-100 dark:opacity-0">
-    <div class="cloud top-20 left-10 w-40 h-40"></div>
-    <div class="cloud top-40 right-20 w-60 h-60 delay-700"></div>
-    <div class="cloud bottom-20 left-1/3 w-80 h-80 delay-1000"></div>
+    {#each clouds as cloud}
+      <div class="cloud-container absolute" style="left: {cloud.x}%; top: {cloud.y}%; --delay: {cloud.delay}s; --opacity: {cloud.opacity};">
+        <!-- Main cloud body made of overlapping circles -->
+        <div class="cloud-part" style="width: {cloud.size}px; height: {cloud.size * 0.6}px; left: 0;"></div>
+        <div class="cloud-part" style="width: {cloud.size * 0.8}px; height: {cloud.size * 0.7}px; left: {cloud.size * 0.3}px; top: {cloud.size * 0.1}px;"></div>
+        <div class="cloud-part" style="width: {cloud.size * 0.9}px; height: {cloud.size * 0.65}px; left: {cloud.size * 0.5}px; top: -{cloud.size * 0.05}px;"></div>
+        <div class="cloud-part" style="width: {cloud.size * 0.7}px; height: {cloud.size * 0.6}px; left: {cloud.size * 0.8}px; top: {cloud.size * 0.08}px;"></div>
+      </div>
+    {/each}
   </div>
 
   <!-- Celestial Body (Sun in Light / Moon in Dark) -->
@@ -134,17 +162,24 @@
   }
 
   /* Light Mode Clouds */
-  .cloud {
+  .cloud-container {
+    position: relative;
+    animation: float 20s infinite ease-in-out;
+    animation-delay: var(--delay, 0s);
+  }
+
+  .cloud-part {
     position: absolute;
-    background: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, var(--opacity, 0.4));
     filter: blur(40px);
     border-radius: 50%;
-    animation: float 20s infinite ease-in-out;
   }
 
   @keyframes float {
-    0%, 100% { transform: translateY(0px) scale(1); }
-    50% { transform: translateY(-20px) scale(1.1); }
+    0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
+    25% { transform: translateY(-15px) translateX(10px) scale(1.05); }
+    50% { transform: translateY(-25px) translateX(5px) scale(1.1); }
+    75% { transform: translateY(-15px) translateX(-5px) scale(1.05); }
   }
 
   /* Order Button Hover Animation */
