@@ -9,6 +9,28 @@
   function toggleTheme() {
     isDarkMode.update(v => !v);
   }
+
+  // Generate random stars
+  interface Star {
+    x: number;
+    y: number;
+    size: number;
+    opacity: number;
+    delay: number;
+  }
+
+  const stars: Star[] = [];
+  const starCount = 100;
+
+  for (let i = 0; i < starCount; i++) {
+    stars.push({
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      size: Math.random() * 2 + 1,
+      opacity: Math.random() * 0.5 + 0.5,
+      delay: Math.random() * 4
+    });
+  }
 </script>
 
 <!-- Main Container: Transition between Light and Dark -->
@@ -19,7 +41,14 @@
   <!-- DECORATIONS -->
 
   <!-- Stars (Dark mode only) -->
-  <div class="stars absolute inset-0 pointer-events-none opacity-0 dark:opacity-100 transition-opacity duration-700"></div>
+  <div class="absolute inset-0 pointer-events-none opacity-0 dark:opacity-100 transition-opacity duration-700">
+    {#each stars as star}
+      <div
+        class="star absolute rounded-full bg-white"
+        style="left: {star.x}%; top: {star.y}%; width: {star.size}px; height: {star.size}px; --base-opacity: {star.opacity}; --delay: {star.delay};"
+      ></div>
+    {/each}
+  </div>
 
   <!-- Clouds (Light mode only) -->
   <div class="absolute inset-0 pointer-events-none transition-opacity duration-700 opacity-100 dark:opacity-0">
@@ -93,23 +122,15 @@
 </div>
 
 <style>
-  /* Stars - Reduced count with twinkling animation (dark mode only) */
-  :global(.dark) .stars {
-    background-image:
-      radial-gradient(2px 2px at 10% 20%, #fff, rgba(0,0,0,0)),
-      radial-gradient(1px 1px at 40% 40%, #ddd, rgba(0,0,0,0)),
-      radial-gradient(2px 2px at 70% 10%, #fff, rgba(0,0,0,0)),
-      radial-gradient(1px 1px at 20% 70%, #eee, rgba(0,0,0,0)),
-      radial-gradient(2px 2px at 90% 60%, #fff, rgba(0,0,0,0)),
-      radial-gradient(1px 1px at 50% 85%, #ddd, rgba(0,0,0,0));
-    background-size: 400px 400px;
-    background-position: 0 0, 100px 50px, 200px 150px;
+  /* Stars - Twinkling animation (dark mode only) */
+  .star {
     animation: twinkle 4s ease-in-out infinite;
+    animation-delay: calc(var(--delay, 0) * 1s);
   }
 
   @keyframes twinkle {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+    0%, 100% { opacity: var(--base-opacity, 1); }
+    50% { opacity: calc(var(--base-opacity, 1) * 0.3); }
   }
 
   /* Light Mode Clouds */
