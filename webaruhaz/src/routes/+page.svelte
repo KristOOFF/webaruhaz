@@ -1,24 +1,62 @@
-<!-- src/routes/+page.svelte -->
+<!--
+  @component HomePage
+
+  Főoldal komponens - termék katalógus és kosár
+
+  Ez az alkalmazás fő oldala, amely megjeleníti a kávétermékeket egy reszponzív
+  grid elrendezésben, valamint kezeli a kosár összesítését és a témaváltást.
+
+  Funkciók:
+  - Termék grid megjelenítése (1-3 oszlop, reszponzív)
+  - Kosár végösszeg megjelenítése
+  - Témaváltó gomb (világos/sötét mód)
+  - Dinamikus dekorációk (csillagok sötét módban, felhők világos módban)
+  - Égi test animáció (nap/hold)
+
+  Vizuális elemek:
+  - Glassmorphism design mindenhol
+  - 100 véletlenszerű csillag villogó animációval (dark mode)
+  - 5 véletlenszerű felhő lebegő animációval (light mode)
+  - Gradient háttér mindkét témában
+  - Smooth átmenetek témaváltáskor (700ms)
+
+  Layout:
+  - Header: cím + témaváltó gomb
+  - Main: termék kártyák grid-ben
+  - Checkout sáv: végösszeg + megrendelés gomb
+  - Footer: copyright információ
+-->
 <script lang="ts">
   import { products } from '$lib/products';
   import { cartTotal } from '$lib/cart';
-  import { isDarkMode } from '$lib/theme'; // Import the store
+  import { isDarkMode } from '$lib/theme';
   import ProductCard from '$lib/components/ProductCard.svelte';
-  import { Coffee, Sun, Moon } from '@lucide/svelte';
+  import { Coffee, Sun, Moon, Shield } from '@lucide/svelte';
 
+  /**
+   * Témaváltó függvény
+   * Invertálja a jelenlegi téma állapotot
+   */
   function toggleTheme() {
     isDarkMode.update(v => !v);
   }
 
-  // Generate random stars
+  /**
+   * Csillag interfész
+   * Definiálja egy egyedi csillag tulajdonságait a dark mode animációhoz
+   */
   interface Star {
-    x: number;
-    y: number;
-    size: number;
-    opacity: number;
-    delay: number;
+    x: number;      // Vízszintes pozíció (0-100%)
+    y: number;      // Függőleges pozíció (0-100%)
+    size: number;   // Csillag mérete pixelben
+    opacity: number; // Alapértelmezett átlátszóság
+    delay: number;  // Animáció késleltetés másodpercben
   }
 
+  /**
+   * Csillagok generálása
+   * 100 véletlenszerű pozíciójú, méretű és villogási mintájú csillag
+   */
   const stars: Star[] = [];
   const starCount = 100;
 
@@ -26,31 +64,38 @@
     stars.push({
       x: Math.random() * 100,
       y: Math.random() * 100,
-      size: Math.random() * 2 + 1,
-      opacity: Math.random() * 0.5 + 0.5,
-      delay: Math.random() * 4
+      size: Math.random() * 2 + 1,         // 1-3px méret
+      opacity: Math.random() * 0.5 + 0.5,  // 0.5-1.0 átlátszóság
+      delay: Math.random() * 4              // 0-4s késleltetés
     });
   }
 
-  // Generate random clouds
+  /**
+   * Felhő interfész
+   * Definiálja egy egyedi felhő tulajdonságait a light mode animációhoz
+   */
   interface Cloud {
-    x: number;
-    y: number;
-    size: number;
-    opacity: number;
-    delay: number;
+    x: number;      // Vízszintes pozíció (0-100%)
+    y: number;      // Függőleges pozíció (0-60%)
+    size: number;   // Felhő mérete pixelben
+    opacity: number; // Átlátszóság (0.3-0.6)
+    delay: number;  // Animáció késleltetés másodpercben
   }
 
+  /**
+   * Felhők generálása
+   * 5 véletlenszerű pozíciójú, méretű és lebegési mintájú felhő
+   */
   const clouds: Cloud[] = [];
   const cloudCount = 5;
 
   for (let i = 0; i < cloudCount; i++) {
     clouds.push({
       x: Math.random() * 100,
-      y: Math.random() * 60, // Keep clouds in upper/middle portion
-      size: Math.random() * 60 + 40, // Size between 40 and 100
-      opacity: Math.random() * 0.3 + 0.3, // Opacity between 0.3 and 0.6
-      delay: Math.random() * 20
+      y: Math.random() * 60,               // Felső/középső rész (0-60%)
+      size: Math.random() * 60 + 40,       // 40-100px méret
+      opacity: Math.random() * 0.3 + 0.3,  // 0.3-0.6 átlátszóság
+      delay: Math.random() * 20             // 0-20s késleltetés
     });
   }
 </script>
@@ -102,7 +147,12 @@
     </div>
 
     <!-- Theme Toggle Button -->
-    <div class="absolute right-4 top-8 sm:right-10">
+    <div class="absolute right-4 top-8 sm:right-10 flex gap-2">
+      <a href="/admin" class="w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-300 backdrop-blur-xl
+        bg-white/30 border-white/50 text-gray-800 hover:bg-white/40 hover:border-white/70 shadow-lg
+        dark:bg-white/[0.03] dark:border-white/[0.08] dark:text-purple-400 dark:hover:bg-white/[0.05] dark:hover:border-white/[0.12] dark:shadow-[0_4px_16px_0_rgba(0,0,0,0.4)]">
+        <Shield size={20} />
+      </a>
       <button on:click={toggleTheme} class="w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-300 backdrop-blur-xl
         bg-white/30 border-white/50 text-gray-800 hover:bg-white/40 hover:border-white/70 shadow-lg
         dark:bg-white/[0.03] dark:border-white/[0.08] dark:text-yellow-400 dark:hover:bg-white/[0.05] dark:hover:border-white/[0.12] dark:shadow-[0_4px_16px_0_rgba(0,0,0,0.4)]">
@@ -136,11 +186,13 @@
       </div>
 
       <!-- Button -->
-      <button class="order-button w-full font-bold py-3 rounded-xl shadow-lg transition-all duration-300 transform active:scale-95 text-white
-        bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 hover:scale-105 hover:shadow-2xl
-        dark:from-pink-500 dark:via-purple-500 dark:to-purple-600 dark:hover:from-pink-600 dark:hover:to-purple-700">
-        Megrendelés
-      </button>
+      <a href="/checkout">
+        <button class="w-full font-bold py-3 rounded-xl transition-all duration-300 transform active:scale-95 backdrop-blur-xl border
+          bg-white/20 border-white/40 text-gray-800 hover:bg-white/30 hover:border-white/50 shadow-lg
+          dark:bg-white/[0.03] dark:border-white/[0.08] dark:text-white dark:hover:bg-white/[0.05] dark:hover:border-white/[0.12] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)]">
+          Megrendelés
+        </button>
+      </a>
     </div>
   </div>
 
@@ -180,38 +232,5 @@
     25% { transform: translateY(-15px) translateX(10px) scale(1.05); }
     50% { transform: translateY(-25px) translateX(5px) scale(1.1); }
     75% { transform: translateY(-15px) translateX(-5px) scale(1.05); }
-  }
-
-  /* Order Button Hover Animation */
-  .order-button {
-    position: relative;
-    overflow: hidden;
-    will-change: transform, box-shadow;
-  }
-
-  .order-button::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%) scale(0);
-    transition: transform 0.4s ease-out;
-    will-change: transform;
-  }
-
-  .order-button:hover::before {
-    transform: translate(-50%, -50%) scale(2.5);
-  }
-
-  .order-button:hover {
-    box-shadow: 0 0 25px rgba(236, 72, 153, 0.6);
-  }
-
-  :global(.dark) .order-button:hover {
-    box-shadow: 0 0 25px rgba(168, 85, 247, 0.8);
   }
 </style>
