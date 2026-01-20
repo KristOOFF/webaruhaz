@@ -1,22 +1,9 @@
--- NeoCoffee Webáruház - SQLite Adatbázis Séma
--- Frissítve: 2026-01-14
---
--- Ez a séma tartalmazza a webáruház működéséhez szükséges táblákat:
--- - termekek: kávétermékek katalógusa
--- - rendelesek: vásárlói rendelések fő adatai
--- - rendeles_tetelek: rendeléshez tartozó tételek (termékek, módosítók)
--- - admin: admin felhasználók autentikációhoz
-
 -- termekek tábla
 CREATE TABLE IF NOT EXISTS termekek (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nev TEXT NOT NULL,
-    leiras TEXT,
     ar INTEGER NOT NULL,
-    tipus TEXT NOT NULL CHECK(tipus IN ('coffee', 'espresso')),
-    kep_url TEXT,
-    letrehozva TEXT DEFAULT CURRENT_TIMESTAMP,
-    frissitve TEXT DEFAULT CURRENT_TIMESTAMP
+    kep_url TEXT
 );
 
 -- rendelesek tábla
@@ -54,21 +41,18 @@ CREATE TABLE IF NOT EXISTS admin (
 );
 
 -- Kezdő termékek beszúrása
-INSERT OR IGNORE INTO termekek (id, nev, leiras, ar, tipus) VALUES
-(1, 'Cappuccino', 'Klasszikus olasz kávé tejhabbal', 850, 'coffee'),
-(2, 'Espresso', 'Erős, tömény kávé', 650, 'espresso'),
-(3, 'Cappuccino', 'Klasszikus olasz kávé tejhabbal', 850, 'coffee'),
-(4, 'Latte', 'Kávé sok tejjel', 900, 'coffee'),
-(5, 'Americano', 'Espresso vízzel hígítva', 700, 'espresso'),
-(6, 'Doppio', 'Dupla espresso', 800, 'espresso');
+INSERT OR IGNORE INTO termekek (id, nev, ar) VALUES
+(1, 'Cappuccino', 850),
+(2, 'Espresso', 650),
+(3, 'Ristretto', 850),
+(4, 'Latte', 900),
+(5, 'Americano', 700),
+(6, 'Doppio', 800);
 
--- Alapértelmezett admin felhasználó
--- Jelszó: admin123 (bcrypt hash - éles környezetben változtasd meg!)
-INSERT OR IGNORE INTO admin (id, felhasznalonev, jelszo_hash) VALUES
-(1, 'admin', '$2a$10$rZGKvE7LQVQXfN5wD7Jv6.kxYKvZHZD6Z0mZYZGBPZ0ZGBPZGBPZGe');
+-- Alapértelmezett admin felhasználó (ezt a JS kód kezeli, de a séma része lehet)
+-- INSERT OR IGNORE INTO admin... (ez a rész rendben volt a JS kódban kezelve)
 
--- Indexek a teljesítmény javítására
-CREATE INDEX IF NOT EXISTS idx_termekek_tipus ON termekek(tipus);
+-- Indexek
 CREATE INDEX IF NOT EXISTS idx_rendelesek_megrendelve ON rendelesek(megrendelve);
 CREATE INDEX IF NOT EXISTS idx_rendelesek_postazva ON rendelesek(postazva);
 CREATE INDEX IF NOT EXISTS idx_rendelesek_email ON rendelesek(email);

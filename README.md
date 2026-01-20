@@ -228,7 +228,7 @@ webaruhaz/
 #### 3. Rendelések kezelése (Admin - `/admin`)
 
 1. Nyisd meg az admin felületet: `/admin` útvonalon
-2. **Bejelentkezés**: Felhasználónév: `admin`, Jelszó: `admin123`
+2. **Bejelentkezés**: Felhasználónév: `admin`, Jelszó: `Minad123!`
 3. **Rendelések megtekintése**:
    - Táblázat összes rendeléssel
    - Vevő adatok (név, email, telefon, cím)
