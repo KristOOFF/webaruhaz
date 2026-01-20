@@ -63,10 +63,11 @@
 
     <!-- Theme Toggle Button -->
     <div class="absolute right-4 top-8 sm:right-10 flex gap-2">
-      <a href="/admin" class="w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-300 backdrop-blur-xl
+      <a href="/admin" class="h-10 px-4 rounded-full border flex items-center justify-center gap-2 transition-all duration-300 backdrop-blur-xl
         bg-white/30 border-white/50 text-gray-800 hover:bg-white/40 hover:border-white/70 shadow-lg
         dark:bg-white/[0.03] dark:border-white/[0.08] dark:text-purple-400 dark:hover:bg-white/[0.05] dark:hover:border-white/[0.12] dark:shadow-[0_4px_16px_0_rgba(0,0,0,0.4)]">
-        <Shield size={20} />
+        <Shield size={18} />
+        <span class="text-sm font-medium">Admin</span>
       </a>
       <button on:click={toggleTheme} class="w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-300 backdrop-blur-xl
         bg-white/30 border-white/50 text-gray-800 hover:bg-white/40 hover:border-white/70 shadow-lg

@@ -1,5 +1,11 @@
 # API Endpoints - NeoCoffee Webáruház
 
+A backend API a `http://localhost:3000` címen érhető el.
+
+**Megjegyzés**: A checkout oldal jelenleg lokális store-ba menti a rendeléseket, nem az API-ba.
+
+---
+
 ## Termékek (Products)
 
 ### `GET /api/products`
@@ -139,45 +145,6 @@ Egy adott rendelés részletei (Admin vagy saját rendelés esetén email alapj�
 }
 ```
 
-### `POST /api/orders`
-Új rendelés leadása.
-
-**Request:**
-```json
-{
-  "vevo_nev": "Kovács János",
-  "telefon": "+36 30 123 4567",
-  "email": "kovacs.janos@example.com",
-  "iranyitoszam": "1111",
-  "telepules": "Budapest",
-  "utca_hazszam": "Kossuth Lajos utca 12",
-  "items": [
-    {
-      "termek_nev": "Cappuccino",
-      "termek_ar": 850,
-      "mennyiseg": 2,
-      "tej": "Cow",
-      "cukor": "1 spoon"
-    },
-    {
-      "termek_nev": "Espresso",
-      "termek_ar": 650,
-      "mennyiseg": 1,
-      "tej": "None",
-      "cukor": "None"
-    }
-  ]
-}
-```
-
-**Válasz:**
-```json
-{
-  "id": 1001,
-  "message": "Rendelés sikeresen leadva"
-}
-```
-
 ### `PATCH /api/orders/:id/ship`
 Rendelés postázási státuszának módosítása (Admin).
 
@@ -238,7 +205,7 @@ Admin kijelentkezés.
 ```
 
 ### `GET /api/admin/verify`
-Token验证 (Admin session ellenőrzés).
+Token ellenőrzés (Admin session validáció).
 
 **Headers:**
 ```

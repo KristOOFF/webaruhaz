@@ -5,7 +5,7 @@ const db = new Database('webaruhaz.db');
 console.log('=== NeoCoffee Adatbázis Struktúra ===\n');
 
 // Termékek tábla
-console.log('📦 TERMÉKEK TÁBLA');
+console.log(' TERMÉKEK TÁBLA');
 console.log('─'.repeat(50));
 const products = db.prepare('SELECT * FROM termekek').all();
 console.log(`Termékek száma: ${products.length}\n`);
@@ -17,7 +17,7 @@ products.forEach(p => {
 });
 
 // Rendelések tábla
-console.log('\n📋 RENDELÉSEK TÁBLA');
+console.log('\n RENDELÉSEK TÁBLA');
 console.log('─'.repeat(50));
 const orders = db.prepare('SELECT * FROM rendelesek').all();
 console.log(`Rendelések száma: ${orders.length}`);

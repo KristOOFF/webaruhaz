@@ -1,10 +1,16 @@
 # NeoCoffee Webáruház
 
-Modern, glassmorphism stílusú kávé webshop alkalmazás SvelteKit és Tailwind CSS technológiákkal.
+Modern, glassmorphism stílusú kávé webshop alkalmazás SvelteKit frontend és Express.js backend technológiákkal.
 
 ![SvelteKit](https://img.shields.io/badge/SvelteKit-FF3E00?style=flat&logo=svelte&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat&logo=tailwind-css&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-000000?style=flat&logo=express&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?style=flat&logo=sqlite&logoColor=white)
+
+## Bevezetés
+
+A NeoCoffee egy kávé webáruház, amely lehetővé teszi a felhasználók számára kávék rendelését testreszabható opciókkal (tej típus, cukor mennyiség). Az admin felületen a rendelések kezelhetők.
 
 ## Funkciók
 
@@ -44,8 +50,11 @@ Modern, glassmorphism stílusú kávé webshop alkalmazás SvelteKit és Tailwin
 
 ### Admin felület
 
+- **Bejelentkezés**: JWT token alapú autentikáció
+  - Felhasználónév: `admin`
+  - Jelszó: `Minad123!`
 - **Rendelések kezelése** shadcn-svelte Table komponenssel:
-  - Összes rendelés listázása táblázatos formában
+  - Összes rendelés listázása táblázatos formában (API-ból)
   - Vevő adatok (név, email, telefon, cím)
   - Rendelés dátuma
   - Postázási státusz (feldolgozás alatt / postázva)
@@ -78,43 +87,22 @@ Modern, glassmorphism stílusú kávé webshop alkalmazás SvelteKit és Tailwin
 
 ## Technológiai Stack
 
-### Frontend Framework
+### Frontend
 - **SvelteKit 2.49.1** - Modern meta-framework
 - **Svelte 5.45.6** - Reaktív komponens framework (Runes API)
-
-### UI Komponens Könyvtár
-- **shadcn-svelte 1.1.0** - Újrafelhasználható UI komponensek
-  - Button, Badge, Card, Dialog, Table komponensek
-  - Input, Label form komponensek
-  - Select dropdown komponens
-- **bits-ui** - Headless UI primitívek (shadcn alapja)
-- **tailwind-variants** - Komponens variant rendszer
-
-### Stílus
 - **Tailwind CSS 4.1.17** - Utility-first CSS framework
-- **@tailwindcss/vite 4.1.17** - Tailwind Vite plugin
-- **tw-animate-css** - Tailwind animációs kiegészítések
+- **shadcn-svelte 1.1.0** - Újrafelhasználható UI komponensek
+- **@lucide/svelte** - Ikon könyvtár
+- **TypeScript 5.9.3** - Típusbiztonság
+
+### Backend
+- **Express.js 4.22.1** - REST API szerver
+- **better-sqlite3** - SQLite adatbázis driver
+- **bcrypt** - Jelszó hash-elés
+- **jsonwebtoken** - JWT token kezelés
 
 ### Build Tools
 - **Vite 7.2.6** - Gyors build tool és dev szerver
-- **TypeScript 5.9.3** - Típusbiztonság
-
-### Ikonok
-- **@lucide/svelte 0.562.0** - Modern ikonok
-  - Coffee, ShoppingCart, Package (alkalmazás ikonok)
-  - Sun, Moon (témaváltás)
-  - Plus, Minus (mennyiség gombok)
-  - ArrowLeft (navigáció)
-  - Trash2, Eye (admin műveletek)
-
-### Egyéb
-- **@sveltejs/adapter-auto 7.0.0** - Automatikus deployment adapter
-- **clsx** - CSS osztály kezelés
-- **tailwind-merge** - Tailwind osztály egyesítés
-
-### Dev Tools
-- **svelte-check 4.3.4** - Típusellenőrzés
-- **Svelte Vite Plugin** - Svelte támogatás Vite-ban
 
 ## Telepítés
 
@@ -142,117 +130,70 @@ pnpm install
 yarn install
 ```
 
-3. **Környezet ellenőrzése**
+3. **Adatbázis inicializálása**
 
 ```bash
-npm run check
+npm run db:init
 ```
 
 ## Fejlesztés
 
-### Development szerver indítása
+### Development szerver indítása (frontend + backend)
+
+```bash
+npm run dev:all
+```
+
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:3000`
+
+### Csak frontend indítása
 
 ```bash
 npm run dev
 ```
 
-Az alkalmazás alapértelmezetten a `http://localhost:5173` címen érhető el.
-
-### Dev szerver megnyitása böngészőben
+### Csak backend indítása
 
 ```bash
-npm run dev -- --open
+npm run server
 ```
 
-### Típusellenőrzés
+### Adatbázis parancsok
 
 ```bash
-# Egyszeri ellenőrzés
-npm run check
-
-# Folyamatos ellenőrzés (watch mode)
-npm run check:watch
+npm run db:init    # Adatbázis inicializálása
+npm run db:reset   # Adatbázis visszaállítása
+npm run db:check   # Adatbázis ellenőrzése
 ```
-
-### Fájlstruktúra navigáció
-
-```
-src/
-├── lib/
-│   ├── assets/
-│   │   └── favicon.svg          # Alkalmazás ikon
-│   ├── components/
-│   │   ├── ui/                  # shadcn-svelte UI komponensek
-│   │   │   ├── button/          # Button komponens (glassmorphism)
-│   │   │   ├── badge/           # Badge komponens (success, warning, destructive)
-│   │   │   ├── card/            # Card komponens (glassmorphism)
-│   │   │   ├── dialog/          # Dialog modal komponens
-│   │   │   ├── table/           # Table komponensek
-│   │   │   ├── input/           # Input komponens (glassmorphism)
-│   │   │   ├── label/           # Label komponens
-│   │   │   └── select/          # Select dropdown komponens
-│   │   └── ProductCard.svelte   # Termék kártya komponens (shadcn Card+Select)
-│   ├── cart.ts                  # Kosár állapotkezelés (addToCart, cartTotal)
-│   ├── orders.ts                # Rendelések store és mock adatok
-│   ├── products.ts              # Termék katalógus
-│   ├── theme.ts                 # Téma kezelés (isDarkMode store)
-│   ├── types.ts                 # TypeScript típusdefiníciók
-│   └── utils.ts                 # Utility függvények (cn - class merger)
-└── routes/
-    ├── admin/
-    │   └── +page.svelte         # Admin felület (rendelések kezelése)
-    ├── checkout/
-    │   └── +page.svelte         # Pénztár oldal (rendelési űrlap)
-    ├── +layout.svelte           # Gyökér layout (dark mode class)
-    ├── +page.svelte             # Főoldal (termékek és kosár)
-    └── layout.css               # Globális stílusok (Tailwind, glassmorphism)
-```
-
-## Build és Deployment
-
-### Production build készítése
-
-```bash
-npm run build
-```
-
-A build kimenet a `.svelte-kit/output` mappába kerül.
-
-### Production build előnézet
-
-```bash
-npm run preview
-```
-
-Egyedi adapter használatához módosítsd a [svelte.config.js](svelte.config.js) fájlt.
 
 ## Projekt Struktúra
 
 ```
 webaruhaz/
-├── src/
-│   ├── lib/                     # Újrafelhasználható kód
-│   │   ├── assets/              # Statikus asszetek (favicon)
-│   │   ├── components/          # Svelte komponensek
-│   │   ├── cart.ts              # Kosár store és logika
+├── src/                         # Frontend forráskód
+│   ├── lib/
+│   │   ├── components/
+│   │   │   ├── ui/              # shadcn-svelte UI komponensek
+│   │   │   ├── ProductCard.svelte
+│   │   │   └── ThemeDecorations.svelte
+│   │   ├── api.ts               # Backend API kliens
+│   │   ├── cart.ts              # Kosár store
+│   │   ├── orders.ts            # Rendelések store
 │   │   ├── products.ts          # Termék adatok
-│   │   ├── theme.ts             # Téma store és logika
-│   │   ├── types.ts             # TypeScript típusok
-│   │   └── index.ts             # Library export pont
-│   ├── routes/                  # SvelteKit oldalak
-│   │   ├── +layout.svelte       # Globális layout
-│   │   ├── +page.svelte         # Kezdőlap
-│   │   └── layout.css           # Globális CSS
-│   ├── app.d.ts                 # App típusdefiníciók
-│   └── app.html                 # HTML sablon
-├── static/                      # Publikus statikus fájlok
-│   └── robots.txt               # SEO konfiguráció
-├── .vscode/                     # VS Code beállítások
-├── package.json                 # NPM függőségek
-├── svelte.config.js             # SvelteKit konfiguráció
-├── tsconfig.json                # TypeScript konfiguráció
-├── vite.config.ts               # Vite konfiguráció
-└── README.md                    # Ez a fájl
+│   │   ├── theme.ts             # Téma store
+│   │   └── types.ts             # TypeScript típusok
+│   └── routes/
+│       ├── +page.svelte         # Főoldal
+│       ├── checkout/+page.svelte # Pénztár
+│       └── admin/+page.svelte   # Admin felület
+├── server.cjs                   # Express backend szerver
+├── schema.sql                   # Adatbázis séma
+├── webaruhaz.db                 # SQLite adatbázis
+├── package.json
+├── svelte.config.js
+├── vite.config.ts
+└── tsconfig.json
 ```
 
 ## Használat
@@ -287,11 +228,12 @@ webaruhaz/
 #### 3. Rendelések kezelése (Admin - `/admin`)
 
 1. Nyisd meg az admin felületet: `/admin` útvonalon
-2. **Rendelések megtekintése**:
+2. **Bejelentkezés**: Felhasználónév: `admin`, Jelszó: `admin123`
+3. **Rendelések megtekintése**:
    - Táblázat összes rendeléssel
    - Vevő adatok (név, email, telefon, cím)
    - Rendelés dátuma és státusza
-3. **Műveletek**:
+4. **Műveletek**:
    - **"Megjelenítés" gomb**: Rendelés tételeinek megtekintése modal ablakban
    - **"Postázás" gomb**: Rendelés postázottá jelölése (zöld badge)
    - **"Visszavonás" gomb**: Postázás visszavonása
@@ -299,41 +241,4 @@ webaruhaz/
 
 ### Témaváltás
 
-Kattints a jobb felső sarokban lévő nap/hold ikonra a világos és sötét téma között váltáshoz. A választásod automatikusan mentésre kerül a localStorage-ba és az oldal újratöltése után is megmarad.
-
-## Konfigurációk
-
-### Tailwind CSS
-
-A Tailwind konfiguráció a [layout.css](src/routes/layout.css)-ben található:
-
-```css
-@import 'tailwindcss';
-```
-
-### TypeScript
-
-Strict mode engedélyezve a [tsconfig.json](tsconfig.json)-ban a maximális típusbiztonságért.
-
-### Vite
-
-A [vite.config.ts](vite.config.ts) tartalmazza a Svelte és Tailwind plugin konfigurációkat.
-
-### SvelteKit
-
-Az [svelte.config.js](svelte.config.js) beállítja a Vite preprocessort és az auto adaptert.
-
-## Design Rendszer
-
-### Glassmorphism Implementáció
-
-Az alkalmazás egyedi glassmorphism design rendszert használ, amely a `layout.css` fájlban van definiálva:
-
-- **`.glass-light`**: Világos mód glassmorphism (fehér/30% átlátszóság, blur 60px)
-- **`.glass-dark`**: Sötét mód glassmorphism (fehér/5% átlátszóság)
-- **`.glass-interactive`**: Hover effektekkel rendelkező interaktív glassmorphism
-
-Minden shadcn-svelte komponens testreszabásra került glassmorphism stílussal:
-- Button, Badge, Card, Dialog, Input, Select komponensek
-- Egységes vizuális megjelenés mindkét témában
-- Smooth átmenetek (200-300ms) minden interakción
+Kattints a jobb felső sarokban lévő nap/hold ikonra a világos és sötét téma között váltáshoz. A választásod automatikusan mentésre kerül a localStorage-ba.

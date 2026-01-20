@@ -24,7 +24,6 @@ interface Product {
   id: number;
   name: string;
   price: number;
-  type: 'coffee' | 'espresso';
 }
 ```
 
@@ -35,7 +34,6 @@ interface Product {
 | `id` | `number` | A termék egyedi azonosítója |
 | `name` | `string` | A termék megjelenítési neve (pl. "Cappuccino") |
 | `price` | `number` | A termék ára magyar forintban |
-| `type` | `'coffee' \| 'espresso'` | A termék kategóriája |
 
 **Példa**:
 
@@ -44,7 +42,6 @@ const product: Product = {
   id: 1,
   name: 'Cappuccino',
   price: 850,
-  type: 'coffee'
 };
 ```
 
@@ -108,7 +105,6 @@ const cartItem: CartItem = {
   id: 1,
   name: 'Cappuccino',
   price: 850,
-  type: 'coffee',
   quantity: 2,
   modifiers: {
     milk: 'Zabtej',
@@ -229,9 +225,9 @@ Termék katalógus.
 
 | ID | Név | Ár (Ft) | Típus |
 |----|-----|---------|-------|
-| 1 | Cappuccino | 850 | coffee |
-| 2 | Espresso | 650 | espresso |
-| 3 | Cappuccino | 850 | coffee |
+| 1 | Cappuccino | 850 |
+| 2 | Espresso | 650 |
+| 3 | Cappuccino | 850 |
 | 4 | Latte | 900 | coffee |
 | 5 | Americano | 700 | espresso |
 | 6 | Doppio | 800 | espresso |
@@ -324,112 +320,27 @@ Egyedi termék megjelenítő kártya komponens.
 
 ---
 
-### `HomePage` (+page.svelte)
+### `ThemeDecorations`
 
-Főoldal komponens - termék katalógus és kosár összesítés.
+Téma dekorációk komponens - csillagok és felhők.
 
-**Fájl**: [`src/routes/+page.svelte`](src/routes/+page.svelte)
-
-#### Props
-
-Nincs (ez egy route komponens, nem prop-okat fogad).
-
-#### Helyi állapot
-
-**Csillagok** (`stars: Star[]`):
-- 100 véletlenszerű pozíciójú csillag
-- Villogó animációval (dark mode-ban látható)
-
-**Felhők** (`clouds: Cloud[]`):
-- 5 véletlenszerű pozíciójú felhő
-- Lebegő animációval (light mode-ban látható)
-
-#### Függvények
-
-**`toggleTheme()`**
-- **Leírás**: Váltás világos és sötét téma között
-- **Működés**: Invertálja `isDarkMode` store értékét
-
-#### Layout struktúra
-
-```
-┌─────────────────────────────────────┐
-│ Dekorációk (csillagok/felhők, nap/hold) │
-├─────────────────────────────────────┤
-│ Header                              │
-│  ├─ Cím + Coffee ikon              │
-│  └─ Témaváltó gomb (jobb felül)    │
-├─────────────────────────────────────┤
-│ Main - Termék Grid                 │
-│  └─ ProductCard × 6 (1-3 oszlop)   │
-├─────────────────────────────────────┤
-│ Checkout Bar                        │
-│  ├─ Összesen: {$cartTotal} Ft      │
-│  └─ Megrendelés gomb               │
-├─────────────────────────────────────┤
-│ Footer (copyright)                  │
-└─────────────────────────────────────┘
-```
-
-#### Reszponzív grid
-
-| Képernyőméret | Oszlopok | Breakpoint |
-|---------------|----------|------------|
-| Mobil | 1 | < 768px |
-| Tablet | 2 | 768px - 1024px |
-| Desktop | 3 | ≥ 1024px |
-
-#### Animációk
-
-**Twinkle** (csillagok):
-```css
-@keyframes twinkle {
-  0%, 100% { opacity: var(--base-opacity); }
-  50% { opacity: calc(var(--base-opacity) * 0.3); }
-}
-```
-- Időtartam: 4s
-- Véletlenszerű késleltetés: 0-4s
-
-**Float** (felhők):
-```css
-@keyframes float {
-  0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
-  25% { transform: translateY(-15px) translateX(10px) scale(1.05); }
-  50% { transform: translateY(-25px) translateX(5px) scale(1.1); }
-  75% { transform: translateY(-15px) translateX(-5px) scale(1.05); }
-}
-```
-- Időtartam: 20s
-- Véletlenszerű késleltetés: 0-20s
-
-#### Használat
-
-Ez egy route komponens, automatikusan renderelődik a `/` útvonalon.
-
----
-
-### `RootLayout` (+layout.svelte)
-
-Gyökér layout komponens.
-
-**Fájl**: [`src/routes/+layout.svelte`](src/routes/+layout.svelte)
-
-#### Props
-
-| Prop | Típus | Leírás |
-|------|-------|--------|
-| `children` | `Snippet` | Gyerek komponensek (SvelteKit által átadott) |
+**Fájl**: [`src/lib/components/ThemeDecorations.svelte`](src/lib/components/ThemeDecorations.svelte)
 
 #### Funkciók
 
-1. **Globális CSS betöltés**: `layout.css` import (Tailwind)
-2. **Favicon beállítás**: `<svelte:head>` segítségével
-3. **Children renderelés**: `{@render children()}`
+- **100 csillag**: Véletlenszerű pozíció, villogó animáció (sötét mód)
+- **5 felhő**: Véletlenszerű pozíció, lebegő animáció (világos mód)
+- **Égi test**: Nap (világos) / Hold (sötét)
 
 #### Használat
 
-Automatikusan alkalmazódik minden route-ra. Nincs szükség manuális használatra.
+```svelte
+<script>
+  import ThemeDecorations from '$lib/components/ThemeDecorations.svelte';
+</script>
+
+<ThemeDecorations />
+```
 
 ---
 
@@ -519,32 +430,3 @@ addToCart(
 └─────────────────┘
 ```
 
----
-
-## Témázás
-
-### Színpaletta
-
-**Világos mód**:
-- Háttér: Szürke-kék gradiens (`slate-700` → `slate-500`)
-- Kártyák: `bg-white/30` + `border-white/50`
-- Szöveg: `text-gray-800`
-- Hover: `border-white/70`, erősebb árnyék
-
-**Sötét mód**:
-- Háttér: Nagyon sötét kék-fekete (`#0d0e1a`)
-- Kártyák: `bg-white/[0.08]` + `border-white/[0.15]`
-- Szöveg: `text-white` / `text-gray-200`
-- Akcentus: Rózsaszín-lila (`pink-500`, `purple-500`)
-- Hover: `border-white/[0.25]`, sötétebb árnyék
-
-### Glassmorphism hatás
-
-Minden kártya és panel glassmorphism stílust használ:
-
-```css
-backdrop-blur-xl          /* Elmosódott háttér */
-bg-white/[0.08]          /* Átlátszó fehér overlay */
-border-white/[0.15]      /* Vékony világos keret */
-shadow-[...]             /* Árnyék */
-```

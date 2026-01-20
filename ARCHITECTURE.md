@@ -1,8 +1,15 @@
 # Architektúra Dokumentáció
 
+## Áttekintés
+
+A NeoCoffee webáruház egy full-stack alkalmazás:
+- **Frontend**: SvelteKit + Tailwind CSS
+- **Backend**: Express.js REST API
+- **Adatbázis**: SQLite
+
 ---
 
-## Architektúra Minta
+## Frontend Architektúra
 
 ### MVCS (Model-View-Controller-Store)
 
@@ -478,242 +485,44 @@ $$invalidate('count', count = count + 1);
 element.textContent = count; // Direct DOM update
 ```
 
-## Biztonsági Megfontolások
-
-### 1. XSS (Cross-Site Scripting) Védelem
-
-**Svelte automatikus escape**:
-```svelte
-<!-- Biztonságos: Svelte auto-escape -->
-<p>{product.name}</p>
-
-<!-- Veszélyes: Bypass escape (NEM használt az app-ban) -->
-{@html userContent} <!--  KERÜLENDŐ -->
-```
-
-Az alkalmazás **NEM használ `{@html}`**, így XSS nem lehetséges.
-
-### 2. Injection Attacks
-
-**Jelenlegi állapot**:
--  Nincs backend → nincs SQL injection lehetőség
--  Nincs user input feldolgozás szerver oldalon
--  Statikus termék lista → nincs dinamikus script betöltés
-
-**Potenciális kockázat**:
--  Ha backend kerül hozzáadásra: Validáció és sanitizáció szükséges
-
-### 3. LocalStorage Biztonsági Kockázatok
-
-**Tárolt adatok**:
-```javascript
-localStorage.setItem('theme', 'dark');  //  Nem érzékeny adat
-```
-
--  Csak téma preferencia tárolva
--  Nincs token, password, személyes adat
-
-### 4. Dependency Security
-
-**Audit parancsok**:
-```bash
-npm audit                 # Biztonsági audit
-npm audit fix             # Automatikus javítások
-npm outdated              # Elavult package-ek
-```
-
-**Jelenlegi állapot**:
--  Hivatalos Svelte/SvelteKit package-ek
--  Népszerű, auditált könyvtárak (Tailwind, Vite)
-
-### 5. HTTPS és CSP
-
-**Deployment követelmények**:
-```
- HTTPS kötelező (SSL/TLS)
- Content Security Policy (CSP) header ajánlott
-```
-
-**CSP példa konfiguráció**:
-```
-Content-Security-Policy:
-  default-src 'self';
-  script-src 'self' 'unsafe-inline';
-  style-src 'self' 'unsafe-inline';
-  img-src 'self' data:;
-```
-
 ---
 
-## Skálázhatóság
+## Backend Architektúra
 
-### Jelenlegi limitációk
+### Express.js REST API
 
-1. **Nincs backend**:
-   - Kosár nem perzisztens
-   - Nincs felhasználói fiók
-   - Nincs rendelés adatbázis
+A backend az `server.cjs` fájlban található és az alábbi funkciókat biztosítja:
 
-2. **Statikus termék lista**:
-   - Hardcoded termékek `products.ts`-ben
-   - Ár/név módosítás kód változtatást igényel
+- **Termékek kezelése**: CRUD műveletek
+- **Rendelések kezelése**: Listázás, státusz módosítás, törlés
+- **Admin autentikáció**: JWT token alapú
 
-3. **Egyetlen route**:
-   - Csak főoldal létezik
-   - Nincs termék részletek oldal
-   - Nincs checkout flow
+### Adatbázis (SQLite)
 
-### Skálázási lépések
+**Táblák**:
 
-#### 1. szakasz: Backend integráció
+1. **termekek** - Termék katalógus
+2. **rendelesek** - Rendelések fő adatai
+3. **rendeles_tetelek** - Rendelés tételek
+4. **admin** - Admin felhasználók
 
-**REST API endpoint-ok**:
-```typescript
-GET  /api/products              // Termékek listázása
-GET  /api/products/:id          // Termék részletek
-POST /api/cart                  // Kosár mentése
-POST /api/orders                // Rendelés leadása
-```
+A séma a `schema.sql` fájlban található.
 
-**Ajánlott tech stack**:
-- Node.js + Express
-- PostgreSQL vagy MongoDB
-- JWT autentikáció
-
-**Kód változtatások**:
-```typescript
-// products.ts - Jelenlegi
-export const products: Product[] = [ ... ];
-
-// products.ts - Jövőbeli
-export async function getProducts(): Promise<Product[]> {
-  const response = await fetch('/api/products');
-  return response.json();
-}
-```
-
-#### 2. szakasz: Felhasználói rendszer
-
-**Új komponensek**:
-```
-/routes/
-  /login/+page.svelte           // Bejelentkezés
-  /register/+page.svelte        // Regisztráció
-  /profile/+page.svelte         // Profil
-  /orders/+page.svelte          // Rendelések
-```
-
-**Új stores**:
-```typescript
-export const user = writable<User | null>(null);
-export const isAuthenticated = derived(user, $user => $user !== null);
-```
-
-#### 3. szakasz: Termék részletek
-
-**Új route**:
-```
-/routes/
-  /products/
-    /[id]/+page.svelte          // Termék részletek oldal
-```
-
-**Paraméter olvasás**:
-```typescript
-// routes/products/[id]/+page.ts
-export async function load({ params }) {
-  const product = await getProduct(params.id);
-  return { product };
-}
-```
-
-#### 4. szakasz: Adminisztráció
-
-**Admin panel komponensek**:
-```
-/routes/
-  /admin/
-    /products/
-      /+page.svelte             // Termék lista (CRUD)
-      /[id]/edit/+page.svelte   // Termék szerkesztés
-    /orders/+page.svelte        // Rendelések kezelés
-```
-
-**Védett route-ok**:
-```typescript
-// hooks.server.ts
-export async function handle({ event, resolve }) {
-  if (event.url.pathname.startsWith('/admin')) {
-    // Check admin authentication
-  }
-  return resolve(event);
-}
-```
-
-### Adatbázis Séma Tervezés
-
-**Termékek tábla**:
-```sql
-CREATE TABLE products (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  description TEXT,
-  price INTEGER NOT NULL,
-  type VARCHAR(20) NOT NULL CHECK (type IN ('coffee', 'espresso')),
-  image_url VARCHAR(255),
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-```
-
-**Rendelések tábla**:
-```sql
-CREATE TABLE orders (
-  id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id),
-  total INTEGER NOT NULL,
-  status VARCHAR(20) DEFAULT 'pending',
-  created_at TIMESTAMP DEFAULT NOW()
-);
-
-CREATE TABLE order_items (
-  id SERIAL PRIMARY KEY,
-  order_id INTEGER REFERENCES orders(id),
-  product_id INTEGER REFERENCES products(id),
-  quantity INTEGER NOT NULL,
-  milk_type VARCHAR(50),
-  sugar_amount VARCHAR(50),
-  price INTEGER NOT NULL
-);
-```
-
-### Horizontális Skálázás
-
-**Architektúra javaslat (nagy traffic-hez)**:
+### API Endpoint-ok
 
 ```
-                    ┌─────────────┐
-                    │  CDN (imgs) │
-                    └─────────────┘
-                           │
-         ┌─────────────────┼─────────────────┐
-         │                                    │
-    ┌─────────┐                        ┌───────────┐
-    │ Nginx   │ Load Balancer          │ S3/CDN    │
-    │ (LB)    │                        │ (Static)  │
-    └────┬────┘                        └───────────┘
-         │
-    ┌────┴────┐
-    │         │
-┌───▼──┐  ┌──▼───┐
-│ App  │  │ App  │  ← Node.js servers (2-N példány)
-│ #1   │  │ #2   │
-└───┬──┘  └──┬───┘
-    │        │
-    └────┬───┘
-         │
-    ┌────▼─────┐
-    │ Postgres │ ← Master-Slave replication
-    │ (DB)     │
-    └──────────┘
+GET  /api/products           - Termékek listázása
+GET  /api/products/:id       - Termék részletei
+POST /api/products           - Új termék (Admin)
+PUT  /api/products/:id       - Termék módosítása (Admin)
+DELETE /api/products/:id     - Termék törlése (Admin)
+
+GET  /api/orders             - Rendelések listázása (Admin)
+GET  /api/orders/:id         - Rendelés részletei (Admin)
+PATCH /api/orders/:id/ship   - Postázás státusz (Admin)
+DELETE /api/orders/:id       - Rendelés törlése (Admin)
+
+POST /api/admin/login        - Bejelentkezés
+POST /api/admin/logout       - Kijelentkezés
+GET  /api/admin/verify       - Token ellenőrzés
 ```
