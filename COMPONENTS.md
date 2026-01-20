@@ -223,14 +223,14 @@ Termék katalógus.
 
 **Termékek listája**:
 
-| ID | Név | Ár (Ft) | Típus |
-|----|-----|---------|-------|
+| ID | Név | Ár (Ft) |
+|----|-----|---------|
 | 1 | Cappuccino | 850 |
 | 2 | Espresso | 650 |
-| 3 | Cappuccino | 850 |
-| 4 | Latte | 900 | coffee |
-| 5 | Americano | 700 | espresso |
-| 6 | Doppio | 800 | espresso |
+| 3 | Ristretto | 850 |
+| 4 | Latte | 900 |
+| 5 | Americano | 700 |
+| 6 | Doppio | 800 |
 
 **Használat**:
 
