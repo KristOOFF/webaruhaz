@@ -1,11 +1,5 @@
 # API Endpoints - NeoCoffee Webáruház
 
-A backend API a `http://localhost:3000` címen érhető el.
-
-**Megjegyzés**: A checkout oldal jelenleg lokális store-ba menti a rendeléseket, nem az API-ba.
-
----
-
 ## Termékek (Products)
 
 ### `GET /api/products`
@@ -17,12 +11,8 @@ A backend API a `http://localhost:3000` címen érhető el.
   {
     "id": 1,
     "nev": "Cappuccino",
-    "leiras": "Klasszikus olasz kávé tejhabbal",
     "ar": 850,
-    "tipus": "coffee",
     "kep_url": null,
-    "letrehozva": "2026-01-14T10:00:00Z",
-    "frissitve": "2026-01-14T10:00:00Z"
   }
 ]
 ```
@@ -35,12 +25,8 @@ Egy adott termék részletei.
 {
   "id": 1,
   "nev": "Cappuccino",
-  "leiras": "Klasszikus olasz kávé tejhabbal",
   "ar": 850,
-  "tipus": "coffee",
   "kep_url": null,
-  "letrehozva": "2026-01-14T10:00:00Z",
-  "frissitve": "2026-01-14T10:00:00Z"
 }
 ```
 
@@ -50,10 +36,8 @@ Egy adott termék részletei.
 **Request:**
 ```json
 {
-  "nev": "Flat White",
-  "leiras": "Ausztrál specialty kávé",
+  "nev": "Ristretto",
   "ar": 950,
-  "tipus": "coffee",
   "kep_url": null
 }
 ```
@@ -65,17 +49,10 @@ Termék módosítása (Admin).
 ```json
 {
   "nev": "Cappuccino",
-  "leiras": "Prémium olasz kávé tejhabbal",
   "ar": 900,
-  "tipus": "coffee",
   "kep_url": null
 }
 ```
-
-### `DELETE /api/products/:id`
-Termék törlése (Admin).
-
----
 
 ## Rendelések (Orders)
 
@@ -178,7 +155,7 @@ Admin bejelentkezés.
 ```json
 {
   "felhasznalonev": "admin",
-  "jelszo": "admin123"
+  "jelszo": "Minad123!"
 }
 ```
 
