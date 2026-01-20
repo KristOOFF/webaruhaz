@@ -10,7 +10,7 @@ Modern, glassmorphism stílusú kávé webshop alkalmazás SvelteKit frontend é
 
 ## Bevezetés
 
-A NeoCoffee egy kávé webáruház, amely lehetővé teszi a felhasználók számára kávék rendelését testreszabható opciókkal (tej típus, cukor mennyiség). Az admin felületen a rendelések kezelhetők.
+A NeoCoffee egy kávé webáruház, amely lehetővé teszi a felhasználók számára kávék házhoz rendelését testreszabható opciókkal (tej típus, cukor mennyiség), egy olyan pohár technológiával, ami képes melegen tartani a kávét akár nyolc órán át.
 
 ## Funkciók
 
