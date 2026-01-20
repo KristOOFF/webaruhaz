@@ -17,6 +17,21 @@
 ]
 ```
 
+### `GET /api/products/:id`
+Egy termék listázása.
+
+**Válasz:**
+```json
+[
+  {
+    "id": 1,
+    "nev": "Cappuccino",
+    "ar": 850,
+    "kep_url": null,
+  }
+]
+```
+
 ### `POST /api/products`
 Új termék létrehozása (Admin).
 
