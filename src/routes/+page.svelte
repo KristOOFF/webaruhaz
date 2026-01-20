@@ -46,7 +46,7 @@
 <!-- Main Container: Transition between Light and Dark -->
 <div class="min-h-screen relative overflow-hidden font-sans transition-colors duration-700
   bg-gradient-to-br from-slate-700 via-slate-600 to-slate-500
-  dark:bg-gradient-to-br dark:from-[#0d0e1a] dark:via-[#0d0e1a] dark:to-[#0d0e1a] selection:bg-pink-400">
+  dark:bg-gradient-to-br dark:from-[#0d0e1a] dark:via-[#0d0e1a] dark:to-[#0d0e1a]">
 
   <!-- DECORATIONS -->
   <ThemeDecorations />
@@ -65,7 +65,7 @@
     <div class="absolute right-4 top-8 sm:right-10 flex gap-2">
       <a href="/admin" class="h-10 px-4 rounded-full border flex items-center justify-center gap-2 transition-all duration-300 backdrop-blur-xl
         bg-white/30 border-white/50 text-gray-800 hover:bg-white/40 hover:border-white/70 shadow-lg
-        dark:bg-white/[0.03] dark:border-white/[0.08] dark:text-purple-400 dark:hover:bg-white/[0.05] dark:hover:border-white/[0.12] dark:shadow-[0_4px_16px_0_rgba(0,0,0,0.4)]">
+        dark:bg-white/[0.03] dark:border-white/[0.08] dark:text-white dark:hover:bg-white/[0.05] dark:hover:border-white/[0.12] dark:shadow-[0_4px_16px_0_rgba(0,0,0,0.4)]">
         <Shield size={18} />
         <span class="text-sm font-medium">Admin</span>
       </a>

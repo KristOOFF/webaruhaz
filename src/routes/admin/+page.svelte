@@ -155,7 +155,7 @@
 <!-- Main Container -->
 <div class="min-h-screen relative overflow-hidden font-sans transition-colors duration-700
   bg-gradient-to-br from-slate-700 via-slate-600 to-slate-500
-  dark:bg-gradient-to-br dark:from-[#0d0e1a] dark:via-[#0d0e1a] dark:to-[#0d0e1a] selection:bg-pink-400">
+  dark:bg-gradient-to-br dark:from-[#0d0e1a] dark:via-[#0d0e1a] dark:to-[#0d0e1a]">
 
   <!-- DECORATIONS -->
   <ThemeDecorations />
