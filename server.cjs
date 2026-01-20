@@ -207,10 +207,6 @@ app.post('/api/products', authMiddleware, (req, res) => {
             return res.status(400).json({ error: 'Név és ár megadása kötelező' });
         }
 
-        if (!['coffee', 'espresso'].includes(tipus)) {
-            return res.status(400).json({ error: 'Típus csak "coffee" vagy "espresso" lehet' });
-        }
-
         const timestamp = now();
         const result = db.prepare(`
             INSERT INTO termekek (nev, leiras, ar, kep_url)
