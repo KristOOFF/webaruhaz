@@ -6,7 +6,7 @@ const db = new Database(dbPath);
 
 db.pragma('foreign_keys = ON');
 
-console.log('=== Tesztadatok hozzáadása ===\n');
+console.log('Tesztadatok hozzáadása\n');
 
 // Tesztrendelések adatai
 const testOrders = [
@@ -153,7 +153,7 @@ const insertAll = db.transaction(() => {
     );
 
     const orderId = result.lastInsertRowid;
-    console.log(`✓ Rendelés hozzáadva: #${orderId} - ${order.vevo_nev} (${order.telepules})`);
+    console.log(`Rendelés hozzáadva: #${orderId} - ${order.vevo_nev} (${order.telepules})`);
 
     for (const item of order.tetelek) {
       insertItem.run(
@@ -164,7 +164,7 @@ const insertAll = db.transaction(() => {
         item.tej,
         item.cukor
       );
-      console.log(`  └─ ${item.mennyiseg}x ${item.termek_nev} (${item.tej}, ${item.cukor})`);
+      console.log(`${item.mennyiseg} ${item.termek_nev} (${item.tej}, ${item.cukor})`);
     }
   }
 });
@@ -178,12 +178,12 @@ try {
   const shippedCount = db.prepare('SELECT COUNT(*) as count FROM rendelesek WHERE postazva = 1').get().count;
   const pendingCount = db.prepare('SELECT COUNT(*) as count FROM rendelesek WHERE postazva = 0').get().count;
 
-  console.log('\n=== Összesítés ===');
+  console.log('\n Összesítés');
   console.log(`Összes rendelés: ${orderCount}`);
   console.log(`Összes tétel: ${itemCount}`);
   console.log(`Postázott: ${shippedCount}`);
   console.log(`Függőben: ${pendingCount}`);
-  console.log('\n✓ Tesztadatok sikeresen hozzáadva!');
+  console.log('\n Tesztadatok sikeresen hozzáadva!');
 
 } catch (error) {
   console.error('Hiba történt:', error.message);
