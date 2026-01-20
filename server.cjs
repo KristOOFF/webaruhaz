@@ -201,10 +201,10 @@ app.get('/api/products/:id', (req, res) => {
  */
 app.post('/api/products', authMiddleware, (req, res) => {
     try {
-        const { nev, leiras, ar, tipus, kep_url } = req.body;
+        const { nev, ar, kep_url } = req.body;
 
-        if (!nev || !ar || !tipus) {
-            return res.status(400).json({ error: 'Név, ár és típus megadása kötelező' });
+        if (!nev || !ar) {
+            return res.status(400).json({ error: 'Név és ár megadása kötelező' });
         }
 
         if (!['coffee', 'espresso'].includes(tipus)) {
@@ -213,7 +213,7 @@ app.post('/api/products', authMiddleware, (req, res) => {
 
         const timestamp = now();
         const result = db.prepare(`
-            INSERT INTO termekek (nev, leiras, ar, tipus, kep_url, letrehozva, frissitve)
+            INSERT INTO termekek (nev, leiras, ar, kep_url)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         `).run(nev, leiras || null, ar, tipus, kep_url || null, timestamp, timestamp);
 
@@ -231,7 +231,7 @@ app.post('/api/products', authMiddleware, (req, res) => {
  */
 app.put('/api/products/:id', authMiddleware, (req, res) => {
     try {
-        const { nev, leiras, ar, tipus, kep_url } = req.body;
+        const { nev, ar, kep_url } = req.body;
         const productId = req.params.id;
 
         const existing = db.prepare('SELECT * FROM termekek WHERE id = ?').get(productId);
@@ -239,19 +239,13 @@ app.put('/api/products/:id', authMiddleware, (req, res) => {
             return res.status(404).json({ error: 'Termék nem található' });
         }
 
-        if (tipus && !['coffee', 'espresso'].includes(tipus)) {
-            return res.status(400).json({ error: 'Típus csak "coffee" vagy "espresso" lehet' });
-        }
-
         db.prepare(`
             UPDATE termekek
-            SET nev = ?, leiras = ?, ar = ?, tipus = ?, kep_url = ?, frissitve = ?
+            SET nev = ?, ar = ?, kep_url = ?,
             WHERE id = ?
         `).run(
             nev || existing.nev,
-            leiras !== undefined ? leiras : existing.leiras,
             ar || existing.ar,
-            tipus || existing.tipus,
             kep_url !== undefined ? kep_url : existing.kep_url,
             now(),
             productId
@@ -325,7 +319,7 @@ app.get('/api/orders', authMiddleware, (req, res) => {
             params.push(email);
         }
 
-        query += ' ORDER BY megrendelve DESC';
+        query += ' ORDER BY id ASC';
 
         const orders = db.prepare(query).all(...params);
         const ordersWithItems = orders.map(buildOrderResponse);

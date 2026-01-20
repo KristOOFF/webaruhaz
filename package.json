@@ -13,6 +13,7 @@
 		"db:init": "node init-db.cjs",
 		"db:reset": "node reset-db.cjs",
 		"db:check": "node check-db.cjs",
+		"db:seed": "node seed-test-data.cjs",
 		"server": "node server.cjs",
 		"dev:all": "concurrently \"npm run dev\" \"npm run server\""
 	},

@@ -28,12 +28,8 @@ Tartalmazza az összes elérhető kávéterméket.
 |------|-------|-------------|--------|
 | `id` | INTEGER | PRIMARY KEY, AUTOINCREMENT | Egyedi azonosító |
 | `nev` | TEXT | NOT NULL | Termék neve (pl. "Cappuccino") |
-| `leiras` | TEXT | - | Termék leírása |
 | `ar` | INTEGER | NOT NULL | Termék ára (Ft) |
-| `tipus` | TEXT | NOT NULL, CHECK | Termék típusa: 'coffee' vagy 'espresso' |
 | `kep_url` | TEXT | - | Termék kép URL-je (opcionális) |
-| `letrehozva` | TEXT | DEFAULT CURRENT_TIMESTAMP | Létrehozás dátuma |
-| `frissitve` | TEXT | DEFAULT CURRENT_TIMESTAMP | Utolsó módosítás dátuma |
 
 **Indexek**:
 - `idx_termekek_tipus` - Gyors szűrés típus szerint
@@ -94,7 +90,7 @@ Admin felhasználók autentikációs adatai.
 
 **Alapértelmezett admin**:
 - Felhasználónév: `admin`
-- Jelszó: `admin123` (**Éles környezetben változtasd meg!**)
+- Jelszó: `Minad123!`
 
 ## Használat
 
@@ -103,7 +99,7 @@ Admin felhasználók autentikációs adatai.
 Az adatbázis első létrehozásához vagy üres adatbázis létrehozásához:
 
 ```bash
-node init-db.cjs
+npm run db:init
 ```
 
 ### Adatbázis újrainicializálása
@@ -111,7 +107,7 @@ node init-db.cjs
 Ha törölni szeretnéd az összes adatot és újra létrehozni az adatbázist:
 
 ```bash
-node reset-db.cjs
+npm run db:reset
 ```
 
 **Figyelem**: Ez az összes adatot törli!
@@ -121,7 +117,15 @@ node reset-db.cjs
 Az adatbázis struktúrájának és tartalmának megtekintéséhez:
 
 ```bash
-node check-db.cjs
+npm run db:check
+```
+
+### Tesztadatok hozzáadása
+
+Tesztadatok hozzáadása az adatbázishoz:
+
+```bash
+npm run db:seed
 ```
 
 ## Scriptek
@@ -149,3 +153,13 @@ Diagnosztikai eszköz az adatbázis ellenőrzéséhez.
 -  Tábla tartalom: listázza az összes adatot
 -  Séma: megmutatja a táblastruktúrát
 -  Statisztika: termékek, rendelések száma
+
+### `seed-test-data.cjs`
+
+Tesztadatokat ad hozzá az adatbázishoz.
+
+- 8 minta rendelés különböző városokból
+- 15 rendelési tétel különböző kávékkal
+- Vegyes postázási státuszok (3 postázott, 5 függőben)
+- Valós magyar címek és adatok
+- Ideális az admin felület teszteléséhez

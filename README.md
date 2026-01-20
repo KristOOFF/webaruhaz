@@ -165,6 +165,7 @@ npm run server
 npm run db:init    # Adatbázis inicializálása
 npm run db:reset   # Adatbázis visszaállítása
 npm run db:check   # Adatbázis ellenőrzése
+npm run db:seed    # Tesztadatok hozzáadása
 ```
 
 ## Projekt Struktúra
