@@ -4,15 +4,16 @@
  * Egy kávétermék alapvető adatait reprezentálja a katalógusban.
  *
  * @interface Product
- * @property {number} id - A termék egyedi azonosítója
+ * @property {string} id - A termék egyedi azonosítója (GUID)
  * @property {string} name - A termék megjelenítési neve (pl. "Cappuccino", "Espresso")
  * @property {number} price - A termék ára magyar forintban (Ft)
- * @property {'coffee' | 'espresso'} type - A termék típusa, amely meghatározza a kategóriáját
+ * @property {string | null} image - A termék képének URL-je (opcionális)
  */
 export interface Product {
-    id: number;
+    id: string;
     name: string;
     price: number;
+    image?: string | null;
 }
 
 /**
@@ -88,7 +89,7 @@ export interface Address {
  * Egy teljes rendelés összes adatát tartalmazza az admin felület számára.
  *
  * @interface Order
- * @property {number} id - A rendelés egyedi azonosítója
+ * @property {string} id - A rendelés egyedi azonosítója (GUID)
  * @property {string} customerName - A vásárló neve
  * @property {string} email - A vásárló email címe
  * @property {string} phone - A vásárló telefonszáma
@@ -99,7 +100,7 @@ export interface Address {
  * @property {OrderItem[]} items - A rendelés tételei
  */
 export interface Order {
-    id: number;
+    id: string;
     customerName: string;
     email: string;
     phone: string;

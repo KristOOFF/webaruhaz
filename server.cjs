@@ -11,6 +11,14 @@ const Database = require('better-sqlite3');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const path = require('path');
+const crypto = require('crypto');
+
+/**
+ * Rövid ID generálása (8 karakter hexadecimális)
+ */
+function generateId() {
+    return crypto.randomBytes(4).toString('hex');
+}
 
 // ============================================================================
 // KONFIGURÁCIÓ
@@ -207,13 +215,13 @@ app.post('/api/products', authMiddleware, (req, res) => {
             return res.status(400).json({ error: 'Név és ár megadása kötelező' });
         }
 
-        const timestamp = now();
-        const result = db.prepare(`
-            INSERT INTO termekek (nev, leiras, ar, kep_url)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        `).run(nev, leiras || null, ar, tipus, kep_url || null, timestamp, timestamp);
+        const productId = generateId();
+        db.prepare(`
+            INSERT INTO termekek (id, nev, ar, kep_url)
+            VALUES (?, ?, ?, ?)
+        `).run(productId, nev, ar, kep_url || null);
 
-        const newProduct = db.prepare('SELECT * FROM termekek WHERE id = ?').get(result.lastInsertRowid);
+        const newProduct = db.prepare('SELECT * FROM termekek WHERE id = ?').get(productId);
         res.status(201).json(newProduct);
     } catch (err) {
         console.error('Create product error:', err);
@@ -237,13 +245,12 @@ app.put('/api/products/:id', authMiddleware, (req, res) => {
 
         db.prepare(`
             UPDATE termekek
-            SET nev = ?, ar = ?, kep_url = ?,
+            SET nev = ?, ar = ?, kep_url = ?
             WHERE id = ?
         `).run(
             nev || existing.nev,
             ar || existing.ar,
             kep_url !== undefined ? kep_url : existing.kep_url,
-            now(),
             productId
         );
 
@@ -315,7 +322,7 @@ app.get('/api/orders', authMiddleware, (req, res) => {
             params.push(email);
         }
 
-        query += ' ORDER BY id ASC';
+        query += ' ORDER BY megrendelve ASC';
 
         const orders = db.prepare(query).all(...params);
         const ordersWithItems = orders.map(buildOrderResponse);
@@ -373,7 +380,7 @@ app.patch('/api/orders/:id/ship', authMiddleware, (req, res) => {
         `).run(postazva, postazva_datum, orderId);
 
         res.json({
-            id: parseInt(orderId),
+            id: orderId,
             postazva,
             postazva_datum
         });
@@ -398,6 +405,86 @@ app.delete('/api/orders/:id', authMiddleware, (req, res) => {
         res.json({ message: 'Rendelés sikeresen törölve' });
     } catch (err) {
         console.error('Delete order error:', err);
+        res.status(500).json({ error: 'Szerver hiba' });
+    }
+});
+
+/**
+ * POST /api/orders
+ * Új rendelés létrehozása (Publikus - vásárlók számára)
+ */
+app.post('/api/orders', (req, res) => {
+    try {
+        const { vevo_nev, telefon, email, iranyitoszam, telepules, utca_hazszam, items } = req.body;
+
+        // Validáció - kötelező mezők
+        if (!vevo_nev || !telefon || !email || !iranyitoszam || !telepules || !utca_hazszam) {
+            return res.status(400).json({ error: 'Minden szállítási adat megadása kötelező' });
+        }
+
+        if (!items || !Array.isArray(items) || items.length === 0) {
+            return res.status(400).json({ error: 'Legalább egy terméket kell rendelni' });
+        }
+
+        // Tételek validálása
+        for (const item of items) {
+            if (!item.termek_nev || !item.termek_ar || !item.mennyiseg || !item.tej || !item.cukor) {
+                return res.status(400).json({ error: 'Minden tétel mezője kötelező' });
+            }
+        }
+
+        // Transaction használata - vagy minden sikeres, vagy semmi
+        const insertOrder = db.prepare(`
+            INSERT INTO rendelesek (id, vevo_nev, telefon, email, iranyitoszam, telepules, utca_hazszam, megrendelve, postazva)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)
+        `);
+
+        const insertItem = db.prepare(`
+            INSERT INTO rendeles_tetelek (id, rendeles_id, termek_nev, termek_ar, mennyiseg, tej, cukor)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        `);
+
+        const transaction = db.transaction((orderData, orderItems) => {
+            // 1. Rendelés beszúrása
+            const orderId = generateId();
+            insertOrder.run(
+                orderId,
+                orderData.vevo_nev,
+                orderData.telefon,
+                orderData.email,
+                orderData.iranyitoszam,
+                orderData.telepules,
+                orderData.utca_hazszam,
+                now()
+            );
+
+            // 2. Tételek beszúrása
+            for (const item of orderItems) {
+                const itemId = generateId();
+                insertItem.run(
+                    itemId,
+                    orderId,
+                    item.termek_nev,
+                    item.termek_ar,
+                    item.mennyiseg,
+                    item.tej,
+                    item.cukor
+                );
+            }
+
+            return orderId;
+        });
+
+        // Transaction végrehajtása
+        const orderId = transaction({ vevo_nev, telefon, email, iranyitoszam, telepules, utca_hazszam }, items);
+
+        // Teljes rendelés visszaadása
+        const newOrder = db.prepare('SELECT * FROM rendelesek WHERE id = ?').get(orderId);
+        const orderWithItems = buildOrderResponse(newOrder);
+
+        res.status(201).json(orderWithItems);
+    } catch (err) {
+        console.error('Create order error:', err);
         res.status(500).json({ error: 'Szerver hiba' });
     }
 });

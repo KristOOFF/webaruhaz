@@ -21,6 +21,7 @@
   import { Label } from '$lib/components/ui/label';
   import * as Dialog from '$lib/components/ui/dialog';
   import * as Table from '$lib/components/ui/table';
+  import * as Select from '$lib/components/ui/select';
 
   // ============================================================================
   // ÁLLAPOTOK
@@ -31,12 +32,25 @@
   let orders = $state<ApiOrder[]>([]);
   let error = $state<string | null>(null);
   let selectedOrder = $state<ApiOrder | null>(null);
+  let selectedOrderNumber = $state<number>(0);
 
   // Login form
   let username = $state('');
   let password = $state('');
   let loginError = $state<string | null>(null);
   let loginLoading = $state(false);
+
+  // Szűrő
+  let statusFilter = $state<string>('all');
+
+  // Szűrt rendelések
+  let filteredOrders = $derived(
+    statusFilter === 'all'
+      ? orders
+      : statusFilter === 'pending'
+        ? orders.filter(o => o.postazva === 0)
+        : orders.filter(o => o.postazva === 1)
+  );
 
   // ============================================================================
   // INICIALIZÁCIÓ
@@ -95,7 +109,7 @@
     orders = [];
   }
 
-  async function deleteOrder(orderId: number) {
+  async function deleteOrder(orderId: string) {
     try {
       await api.deleteOrder(orderId);
       orders = orders.filter(o => o.id !== orderId);
@@ -104,7 +118,7 @@
     }
   }
 
-  async function toggleShipped(orderId: number, currentStatus: number) {
+  async function toggleShipped(orderId: string, currentStatus: number) {
     try {
       const newStatus = currentStatus === 1 ? 0 : 1;
       const result = await api.shipOrder(orderId, newStatus as 0 | 1);
@@ -127,8 +141,9 @@
     isDarkMode.update(v => !v);
   }
 
-  function openOrderDetails(order: ApiOrder) {
+  function openOrderDetails(order: ApiOrder, displayNumber: number) {
     selectedOrder = order;
+    selectedOrderNumber = displayNumber;
   }
 
   function closeOrderDetails() {
@@ -280,15 +295,31 @@
               <Table.Head>Telefon</Table.Head>
               <Table.Head>Cím</Table.Head>
               <Table.Head>Dátum</Table.Head>
-              <Table.Head>Státusz</Table.Head>
+              <Table.Head>
+                <div class="flex items-center gap-2">
+                  <span>Státusz</span>
+                  <Select.Root type="single" bind:value={statusFilter}>
+                    <Select.Trigger size="sm" class="h-5 px-1.5 text-[10px] w-auto min-w-0">
+                      {#snippet children()}
+                        <Select.Value placeholder="Mind" />
+                      {/snippet}
+                    </Select.Trigger>
+                    <Select.Content>
+                      <Select.Item value="all">Mind</Select.Item>
+                      <Select.Item value="pending">Folyamatban</Select.Item>
+                      <Select.Item value="shipped">Kiszállítva</Select.Item>
+                    </Select.Content>
+                  </Select.Root>
+                </div>
+              </Table.Head>
               <Table.Head>Tételek</Table.Head>
               <Table.Head>Műveletek</Table.Head>
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {#each orders as order (order.id)}
+            {#each filteredOrders as order, index (order.id)}
               <Table.Row>
-                <Table.Cell>#{order.id}</Table.Cell>
+                <Table.Cell>#{index + 1}</Table.Cell>
                 <Table.Cell>{order.vevo_nev}</Table.Cell>
                 <Table.Cell>{order.email}</Table.Cell>
                 <Table.Cell>{order.telefon}</Table.Cell>
@@ -300,7 +331,7 @@
                 <Table.Cell>
                   {#if order.postazva === 1}
                     <div class="flex flex-col gap-1">
-                      <Badge variant="success">Postázva</Badge>
+                      <Badge variant="success">Kiszállítva</Badge>
                       <span class="text-xs text-gray-700 dark:text-white">
                         {order.postazva_datum ? formatDate(order.postazva_datum) : ''}
                       </span>
@@ -310,7 +341,7 @@
                   {/if}
                 </Table.Cell>
                 <Table.Cell>
-                  <Button variant="default" size="sm" onclick={() => openOrderDetails(order)}>
+                  <Button variant="default" size="sm" onclick={() => openOrderDetails(order, index + 1)}>
                     {#snippet children()}
                       <Eye size={16} />
                       Megjelenítés
@@ -325,7 +356,7 @@
                       onclick={() => toggleShipped(order.id, order.postazva)}
                     >
                       {#snippet children()}
-                        {order.postazva === 1 ? 'Visszavonás' : 'Postázás'}
+                        {order.postazva === 1 ? 'Visszavonás' : 'Kiszállítás'}
                       {/snippet}
                     </Button>
                     <Button
@@ -345,9 +376,9 @@
           </Table.Body>
         </Table.Root>
 
-        {#if orders.length === 0}
+        {#if filteredOrders.length === 0}
           <div class="text-center py-8 text-gray-700 dark:text-white/60">
-            Nincs megjeleníthető rendelés.
+            {statusFilter === 'all' ? 'Nincs megjeleníthető rendelés.' : 'Nincs a szűrőnek megfelelő rendelés.'}
           </div>
         {/if}
       </div>
@@ -358,7 +389,13 @@
   <Dialog.Root open={selectedOrder !== null} onOpenChange={(open) => { if (!open) closeOrderDetails(); }}>
     <Dialog.Content>
       <Dialog.Header>
-        <Dialog.Title>{selectedOrder ? `Rendelés #${selectedOrder.id} tételei` : ''}</Dialog.Title>
+        <Dialog.Title class="text-2xl">{selectedOrder ? `Rendelés #${selectedOrderNumber} tételei` : ''}</Dialog.Title>
+        {#if selectedOrder}
+          <div>
+            <span class="text-sm font-bold text-gray-800 dark:text-white">Rendelés ID:</span>
+            <span class="ml-2 font-mono text-sm font-bold text-gray-800 dark:text-white select-all">{selectedOrder.id}</span>
+          </div>
+        {/if}
       </Dialog.Header>
 
       {#if selectedOrder}

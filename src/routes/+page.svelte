@@ -1,38 +1,43 @@
 <!--
   @component HomePage
 
-  Főoldal komponens - termék katalógus és kosár
+  Főoldal komponens - termék katalógus és kosár (shadcn-svelte komponensekkel)
 
   Ez az alkalmazás fő oldala, amely megjeleníti a kávétermékeket egy reszponzív
   grid elrendezésben, valamint kezeli a kosár összesítését és a témaváltást.
 
   Funkciók:
-  - Termék grid megjelenítése (1-3 oszlop, reszponzív)
-  - Kosár végösszeg megjelenítése
-  - Témaváltó gomb (világos/sötét mód)
+  - Termék grid megjelenítése shadcn Card komponensekkel
+  - Kosár végösszeg megjelenítése shadcn Card-ban
+  - Témaváltó és admin gombok shadcn Button-nel
   - Dinamikus dekorációk (csillagok sötét módban, felhők világos módban)
   - Égi test animáció (nap/hold)
 
-  Vizuális elemek:
-  - Glassmorphism design mindenhol
-  - 100 véletlenszerű csillag villogó animációval (dark mode)
-  - 5 véletlenszerű felhő lebegő animációval (light mode)
-  - Gradient háttér mindkét témában
-  - Smooth átmenetek témaváltáskor (700ms)
+  shadcn-svelte komponensek:
+  - Card (header címhez, checkout sávhoz, hibaüzenetekhez)
+  - Button (témaváltó, admin link, checkout gomb)
+  - ProductCard (már shadcn komponenseket használ)
 
   Layout:
-  - Header: cím + témaváltó gomb
-  - Main: termék kártyák grid-ben
-  - Checkout sáv: végösszeg + megrendelés gomb
+  - Header: cím Card + témaváltó/admin Button-ök
+  - Main: ProductCard grid
+  - Checkout sáv: Card végösszeggel és checkout Button-nel
   - Footer: copyright információ
 -->
 <script lang="ts">
-  import { products } from '$lib/products';
   import { cartTotal } from '$lib/cart';
   import { isDarkMode } from '$lib/theme';
   import ProductCard from '$lib/components/ProductCard.svelte';
   import ThemeDecorations from '$lib/components/ThemeDecorations.svelte';
-  import { Coffee, Sun, Moon, Shield } from '@lucide/svelte';
+  import { Coffee, Sun, Moon, Shield, ShoppingCart } from '@lucide/svelte';
+  import type { PageData } from './+page';
+
+  // shadcn-svelte komponensek
+  import * as Card from '$lib/components/ui/card';
+  import { Button } from '$lib/components/ui/button';
+
+  // Termékek betöltése a load függvényből (SSR)
+  let { data }: { data: PageData } = $props();
 
   /**
    * Témaváltó függvény
@@ -53,63 +58,84 @@
 
   <!-- HEADER -->
   <header class="flex justify-center items-center py-8 relative px-4 z-20">
-    <!-- Title Box -->
-    <div class="backdrop-blur-xl border px-8 py-3 rounded-2xl flex items-center space-x-3 transition-all duration-300
-      bg-white/20 border-white/30 shadow-lg
-      dark:bg-white/[0.03] dark:border-white/[0.08] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)]">
-      <Coffee class="text-gray-800 dark:text-white transition-colors duration-300" />
-      <h1 class="text-2xl font-bold text-gray-800 dark:text-white tracking-wide drop-shadow-md transition-colors duration-300">Termékeink</h1>
-    </div>
+    <!-- Title Card -->
+    <Card.Root class="border-white/30 shadow-lg backdrop-blur-xl bg-white/20 dark:bg-white/[0.03] dark:border-white/[0.08] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)]">
+      <Card.Content class="flex items-center space-x-3 px-8 py-3">
+        <Coffee class="text-gray-800 dark:text-white transition-colors duration-300" />
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-white tracking-wide drop-shadow-md transition-colors duration-300">Termékeink</h1>
+      </Card.Content>
+    </Card.Root>
 
-    <!-- Theme Toggle Button -->
+    <!-- Action Buttons -->
     <div class="absolute right-4 top-8 sm:right-10 flex gap-2">
-      <a href="/admin" class="h-10 px-4 rounded-full border flex items-center justify-center gap-2 transition-all duration-300 backdrop-blur-xl
-        bg-white/30 border-white/50 text-gray-800 hover:bg-white/40 hover:border-white/70 shadow-lg
-        dark:bg-white/[0.03] dark:border-white/[0.08] dark:text-white dark:hover:bg-white/[0.05] dark:hover:border-white/[0.12] dark:shadow-[0_4px_16px_0_rgba(0,0,0,0.4)]">
-        <Shield size={18} />
-        <span class="text-sm font-medium">Admin</span>
-      </a>
-      <button on:click={toggleTheme} class="w-10 h-10 rounded-full border flex items-center justify-center transition-all duration-300 backdrop-blur-xl
-        bg-white/30 border-white/50 text-gray-800 hover:bg-white/40 hover:border-white/70 shadow-lg
-        dark:bg-white/[0.03] dark:border-white/[0.08] dark:text-yellow-400 dark:hover:bg-white/[0.05] dark:hover:border-white/[0.12] dark:shadow-[0_4px_16px_0_rgba(0,0,0,0.4)]">
-        {#if $isDarkMode}
-          <Sun size={20} />
-        {:else}
-          <Moon size={20} />
-        {/if}
-      </button>
+      <Button variant="outline" size="default" class="h-10 px-4 gap-2" href="/admin">
+        {#snippet children()}
+          <Shield size={18} />
+          <span class="text-sm font-medium">Admin</span>
+        {/snippet}
+      </Button>
+      <Button variant="outline" size="icon" class="w-10 h-10" onclick={toggleTheme}>
+        {#snippet children()}
+          {#if $isDarkMode}
+            <Sun size={20} class="text-yellow-400" />
+          {:else}
+            <Moon size={20} />
+          {/if}
+        {/snippet}
+      </Button>
     </div>
   </header>
 
   <!-- MAIN GRID -->
   <main class="max-w-6xl mx-auto px-4 z-10 relative">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {#each products as product (product.id)}
-        <ProductCard {product} />
-      {/each}
-    </div>
+    {#if data.error}
+      <!-- Hibaüzenet ha az API nem érhető el -->
+      <Card.Root class="border-white/40 shadow-lg backdrop-blur-xl bg-white/20 dark:bg-white/[0.03] dark:border-white/[0.08] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)]">
+        <Card.Content class="p-8 text-center">
+          <p class="text-gray-800 dark:text-white text-lg font-semibold">
+            {data.error}
+          </p>
+          <p class="text-gray-600 dark:text-white/60 mt-2">
+            Kérjük, győződj meg róla, hogy a backend szerver fut.
+          </p>
+        </Card.Content>
+      </Card.Root>
+    {:else if data.products.length === 0}
+      <!-- Üres termék lista -->
+      <Card.Root class="border-white/40 shadow-lg backdrop-blur-xl bg-white/20 dark:bg-white/[0.03] dark:border-white/[0.08] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)]">
+        <Card.Content class="p-8 text-center">
+          <p class="text-gray-800 dark:text-white text-lg font-semibold">
+            Jelenleg nincsenek elérhető termékek.
+          </p>
+        </Card.Content>
+      </Card.Root>
+    {:else}
+      <!-- Termékek grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {#each data.products as product (product.id)}
+          <ProductCard {product} />
+        {/each}
+      </div>
+    {/if}
   </main>
 
   <!-- CHECKOUT BAR -->
-  <div class="px-4 flex justify-center z-10 mt-16 mb-8">
-    <div class="backdrop-blur-xl border rounded-2xl p-6 w-full max-w-lg shadow-2xl flex flex-col space-y-4 transition-all duration-300
-      bg-white/20 border-white/40 shadow-lg
-      dark:bg-white/[0.03] dark:border-white/[0.08] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)]">
+  <div class="px-4 flex justify-center z-10 mt-16 mb-8 relative">
+    <Card.Root class="w-full max-w-lg border-white/40 shadow-2xl backdrop-blur-xl bg-white/20 dark:bg-white/[0.03] dark:border-white/[0.08] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)]">
+      <Card.Content class="p-6 flex flex-col space-y-4">
+        <div class="flex justify-between items-center text-gray-800 dark:text-white transition-colors duration-300">
+          <span class="text-lg font-bold drop-shadow-sm">Összesen:</span>
+          <span class="text-xl font-bold drop-shadow-sm">{$cartTotal} Ft</span>
+        </div>
 
-      <div class="flex justify-between items-center text-gray-800 dark:text-white transition-colors duration-300">
-        <span class="text-lg font-bold drop-shadow-sm">Összesen:</span>
-        <span class="text-xl font-bold drop-shadow-sm">{$cartTotal} Ft</span>
-      </div>
-
-      <!-- Button -->
-      <a href="/checkout">
-        <button class="w-full font-bold py-3 rounded-xl transition-all duration-300 transform active:scale-95 backdrop-blur-xl border
-          bg-white/20 border-white/40 text-gray-800 hover:bg-white/30 hover:border-white/50 shadow-lg
-          dark:bg-white/[0.03] dark:border-white/[0.08] dark:text-white dark:hover:bg-white/[0.05] dark:hover:border-white/[0.12] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)]">
-          Megrendelés
-        </button>
-      </a>
-    </div>
+        <Button variant="default" size="lg" class="w-full" href="/checkout">
+          {#snippet children()}
+            <ShoppingCart size={20} class="mr-2" />
+            Megrendelés
+          {/snippet}
+        </Button>
+      </Card.Content>
+    </Card.Root>
   </div>
 
   <footer class="text-center text-white/60 text-xs py-4 relative w-full z-10">

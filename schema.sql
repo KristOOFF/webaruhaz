@@ -1,6 +1,6 @@
 -- termekek tábla
 CREATE TABLE IF NOT EXISTS termekek (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id TEXT PRIMARY KEY,
     nev TEXT NOT NULL,
     ar INTEGER NOT NULL,
     kep_url TEXT
@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS termekek (
 
 -- rendelesek tábla
 CREATE TABLE IF NOT EXISTS rendelesek (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id TEXT PRIMARY KEY,
     vevo_nev TEXT NOT NULL,
     telefon TEXT NOT NULL,
     email TEXT NOT NULL,
@@ -22,8 +22,8 @@ CREATE TABLE IF NOT EXISTS rendelesek (
 
 -- rendeles_tetelek tábla
 CREATE TABLE IF NOT EXISTS rendeles_tetelek (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    rendeles_id INTEGER NOT NULL,
+    id TEXT PRIMARY KEY,
+    rendeles_id TEXT NOT NULL,
     termek_nev TEXT NOT NULL,
     termek_ar INTEGER NOT NULL,
     mennyiseg INTEGER NOT NULL,
@@ -34,20 +34,20 @@ CREATE TABLE IF NOT EXISTS rendeles_tetelek (
 
 -- admin tábla
 CREATE TABLE IF NOT EXISTS admin (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id TEXT PRIMARY KEY,
     felhasznalonev TEXT NOT NULL UNIQUE,
     jelszo_hash TEXT NOT NULL,
     letrehozva TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
--- Kezdő termékek beszúrása
-INSERT OR IGNORE INTO termekek (id, nev, ar) VALUES
-(1, 'Cappuccino', 850),
-(2, 'Espresso', 650),
-(3, 'Ristretto', 850),
-(4, 'Latte', 900),
-(5, 'Americano', 700),
-(6, 'Doppio', 800);
+-- Kezdő termékek beszúrása (fix rövid ID-kkal)
+INSERT OR IGNORE INTO termekek (id, nev, ar, kep_url) VALUES
+('a1b2c3d4', 'Cappuccino', 850, '/images/cappuccino.jpg'),
+('b2c3d4e5', 'Espresso', 650, '/images/espresso.webp'),
+('c3d4e5f6', 'Ristretto', 850, '/images/ristretto.jpg'),
+('d4e5f6a7', 'Latte', 900, '/images/latte.jpg'),
+('e5f6a7b8', 'Americano', 700, '/images/americano.jpg'),
+('f6a7b8c9', 'Doppio', 800, '/images/doppio.webp');
 
 -- Alapértelmezett admin felhasználó (ezt a JS kód kezeli, de a séma része lehet)
 -- INSERT OR IGNORE INTO admin... (ez a rész rendben volt a JS kódban kezelve)

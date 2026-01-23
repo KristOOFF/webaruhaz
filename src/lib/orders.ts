@@ -17,7 +17,7 @@ import type { Order } from './types';
  */
 const initialOrders: Order[] = [
     {
-        id: 1001,
+        id: 'mock-order-001',
         customerName: 'Kovács János',
         email: 'kovacs.janos@example.com',
         phone: '+36 30 123 4567',
@@ -52,7 +52,7 @@ const initialOrders: Order[] = [
         ]
     },
     {
-        id: 1002,
+        id: 'mock-order-002',
         customerName: 'Nagy Eszter',
         email: 'nagy.eszter@example.com',
         phone: '+36 70 987 6543',
@@ -78,7 +78,7 @@ const initialOrders: Order[] = [
         ]
     },
     {
-        id: 1003,
+        id: 'mock-order-003',
         customerName: 'Szabó Péter',
         email: 'szabo.peter@example.com',
         phone: '+36 20 555 1234',
@@ -122,7 +122,7 @@ const initialOrders: Order[] = [
         ]
     },
     {
-        id: 1004,
+        id: 'mock-order-004',
         customerName: 'Tóth Anna',
         email: 'toth.anna@example.com',
         phone: '+36 30 999 8888',

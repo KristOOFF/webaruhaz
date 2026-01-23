@@ -44,12 +44,12 @@
   /**
    * Helyi állapot - választott tej típus
    */
-  let milk = $state("Tej típus");
+  let milk = $state("Nincs");
 
   /**
    * Helyi állapot - választott cukor mennyiség
    */
-  let sugar = $state("Cukor mennyiség");
+  let sugar = $state("Nincs");
 
   /**
    * Mennyiség csökkentése
@@ -72,12 +72,24 @@
 
 <Card.Root class="flex flex-col items-center text-center p-6">
   <Card.Content class="flex flex-col items-center w-full space-y-4 p-0">
-    <!-- Icon Circle -->
-    <div class="w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300
-      bg-white/40 border border-white/30
-      dark:bg-white/[0.12] dark:border-white/[0.2]">
-      <Coffee class="text-gray-800 dark:text-white w-6 h-6 transition-colors duration-300" />
-    </div>
+    <!-- Product Image -->
+    {#if product.image}
+      <div class="w-32 h-32 rounded-lg overflow-hidden backdrop-blur-md transition-all duration-300
+        bg-white/40 border border-white/30
+        dark:bg-white/[0.12] dark:border-white/[0.2]">
+        <img
+          src={product.image}
+          alt={product.name}
+          class="w-full h-full object-cover"
+        />
+      </div>
+    {:else}
+      <div class="w-32 h-32 rounded-lg flex items-center justify-center backdrop-blur-md transition-all duration-300
+        bg-white/40 border border-white/30
+        dark:bg-white/[0.12] dark:border-white/[0.2]">
+        <Coffee class="text-gray-800 dark:text-white w-12 h-12 transition-colors duration-300" />
+      </div>
+    {/if}
 
     <!-- Title & Price -->
     <div>
@@ -89,11 +101,12 @@
     <Select.Root type="single" bind:value={milk as any}>
       <Select.Trigger class="w-full">
         {#snippet children()}
-          {milk}
+          {milk === "Nincs" ? "Tej típus" : milk}
         {/snippet}
       </Select.Trigger>
       <Select.Content>
         <Select.Label>Tej típus</Select.Label>
+        <Select.Item value="Nincs" label="Nincs" />
         <Select.Item value="Mandula tej" label="Mandula tej" />
         <Select.Item value="Tehéntej" label="Tehéntej" />
         <Select.Item value="Zabtej" label="Zabtej" />
@@ -104,7 +117,7 @@
     <Select.Root type="single" bind:value={sugar as any}>
       <Select.Trigger class="w-full">
         {#snippet children()}
-          {sugar}
+          {sugar === "Nincs" ? "Cukor mennyiség" : sugar}
         {/snippet}
       </Select.Trigger>
       <Select.Content>

@@ -2,6 +2,11 @@ const Database = require('better-sqlite3');
 const bcrypt = require('bcrypt');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
+
+function generateId() {
+    return crypto.randomBytes(4).toString('hex');
+}
 
 // Adatbázis megnyitása vagy létrehozása
 const db = new Database('webaruhaz.db');
@@ -28,7 +33,8 @@ async function init() {
         const hash = await bcrypt.hash('Minad123!', 10);
         const existingAdmin = db.prepare('SELECT id FROM admin WHERE felhasznalonev = ?').get('admin');
         if (!existingAdmin) {
-            db.prepare('INSERT INTO admin (felhasznalonev, jelszo_hash) VALUES (?, ?)').run('admin', hash);
+            const adminId = generateId();
+            db.prepare('INSERT INTO admin (id, felhasznalonev, jelszo_hash) VALUES (?, ?, ?)').run(adminId, 'admin', hash);
             console.log('Admin felhasználó létrehozva');
         } else {
             db.prepare('UPDATE admin SET jelszo_hash = ? WHERE felhasznalonev = ?').run(hash, 'admin');

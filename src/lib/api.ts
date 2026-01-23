@@ -14,21 +14,28 @@ const API_BASE = 'http://localhost:3000/api';
  * Token mentése localStorage-ba
  */
 export function setToken(token: string): void {
-    localStorage.setItem('admin_token', token);
+    if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('admin_token', token);
+    }
 }
 
 /**
  * Token lekérdezése localStorage-ból
  */
 export function getToken(): string | null {
-    return localStorage.getItem('admin_token');
+    if (typeof localStorage !== 'undefined') {
+        return localStorage.getItem('admin_token');
+    }
+    return null;
 }
 
 /**
  * Token törlése
  */
 export function clearToken(): void {
-    localStorage.removeItem('admin_token');
+    if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem('admin_token');
+    }
 }
 
 /**
@@ -74,7 +81,7 @@ async function apiFetch<T>(
 // ============================================================================
 
 export interface AdminUser {
-    id: number;
+    id: string;
     felhasznalonev: string;
     letrehozva?: string;
 }
@@ -124,47 +131,72 @@ export function isLoggedIn(): boolean {
 }
 
 // ============================================================================
-// TERMÉKEK (ADMIN)
+// TERMÉKEK (PUBLIKUS)
 // ============================================================================
 
-export interface Product {
-    id: number;
+/**
+ * Backend Product interfész (adatbázis séma szerint)
+ */
+export interface ApiProduct {
+    id: string;
     nev: string;
-    leiras: string | null;
     ar: number;
-    tipus: 'coffee' | 'espresso';
     kep_url: string | null;
-    letrehozva: string;
-    frissitve: string;
+}
+
+/**
+ * Frontend Product interfész (kompatibilis a types.ts-el)
+ * Ez a formátum amit a frontend komponensek használnak
+ */
+export interface FrontendProduct {
+    id: string;
+    name: string;
+    price: number;
+    image?: string | null;
 }
 
 export interface ProductInput {
     nev: string;
-    leiras?: string;
     ar: number;
-    tipus: 'coffee' | 'espresso';
     kep_url?: string;
 }
 
 /**
  * Összes termék lekérdezése
+ * Átalakítja a backend formátumot frontend formátumra
  */
-export async function getProducts(): Promise<Product[]> {
-    return apiFetch<Product[]>('/products');
+export async function getProducts(): Promise<FrontendProduct[]> {
+    const apiProducts = await apiFetch<ApiProduct[]>('/products');
+
+    // Backend formátum átalakítása frontend formátumra
+    return apiProducts.map(product => ({
+        id: product.id,
+        name: product.nev,
+        price: product.ar,
+        image: product.kep_url
+    }));
 }
 
 /**
  * Egy termék lekérdezése
+ * Átalakítja a backend formátumot frontend formátumra
  */
-export async function getProduct(id: number): Promise<Product> {
-    return apiFetch<Product>(`/products/${id}`);
+export async function getProduct(id: string): Promise<FrontendProduct> {
+    const apiProduct = await apiFetch<ApiProduct>(`/products/${id}`);
+
+    return {
+        id: apiProduct.id,
+        name: apiProduct.nev,
+        price: apiProduct.ar,
+        image: apiProduct.kep_url
+    };
 }
 
 /**
  * Új termék létrehozása (Admin)
  */
-export async function createProduct(product: ProductInput): Promise<Product> {
-    return apiFetch<Product>('/products', {
+export async function createProduct(product: ProductInput): Promise<ApiProduct> {
+    return apiFetch<ApiProduct>('/products', {
         method: 'POST',
         body: JSON.stringify(product)
     });
@@ -173,8 +205,8 @@ export async function createProduct(product: ProductInput): Promise<Product> {
 /**
  * Termék módosítása (Admin)
  */
-export async function updateProduct(id: number, product: Partial<ProductInput>): Promise<Product> {
-    return apiFetch<Product>(`/products/${id}`, {
+export async function updateProduct(id: string, product: Partial<ProductInput>): Promise<ApiProduct> {
+    return apiFetch<ApiProduct>(`/products/${id}`, {
         method: 'PUT',
         body: JSON.stringify(product)
     });
@@ -183,7 +215,7 @@ export async function updateProduct(id: number, product: Partial<ProductInput>):
 /**
  * Termék törlése (Admin)
  */
-export async function deleteProduct(id: number): Promise<void> {
+export async function deleteProduct(id: string): Promise<void> {
     await apiFetch(`/products/${id}`, { method: 'DELETE' });
 }
 
@@ -192,8 +224,8 @@ export async function deleteProduct(id: number): Promise<void> {
 // ============================================================================
 
 export interface OrderItem {
-    id: number;
-    rendeles_id: number;
+    id: string;
+    rendeles_id: string;
     termek_nev: string;
     termek_ar: number;
     mennyiseg: number;
@@ -202,7 +234,7 @@ export interface OrderItem {
 }
 
 export interface ApiOrder {
-    id: number;
+    id: string;
     vevo_nev: string;
     telefon: string;
     email: string;
@@ -235,14 +267,14 @@ export async function getOrders(params?: OrdersQueryParams): Promise<ApiOrder[]>
 /**
  * Egy rendelés lekérdezése (Admin)
  */
-export async function getOrder(id: number): Promise<ApiOrder> {
+export async function getOrder(id: string): Promise<ApiOrder> {
     return apiFetch<ApiOrder>(`/orders/${id}`);
 }
 
 /**
  * Rendelés postázási státusz módosítása (Admin)
  */
-export async function shipOrder(id: number, postazva: 0 | 1): Promise<{ id: number; postazva: number; postazva_datum: string | null }> {
+export async function shipOrder(id: string, postazva: 0 | 1): Promise<{ id: string; postazva: number; postazva_datum: string | null }> {
     return apiFetch(`/orders/${id}/ship`, {
         method: 'PATCH',
         body: JSON.stringify({ postazva })
@@ -252,6 +284,38 @@ export async function shipOrder(id: number, postazva: 0 | 1): Promise<{ id: numb
 /**
  * Rendelés törlése (Admin)
  */
-export async function deleteOrder(id: number): Promise<void> {
+export async function deleteOrder(id: string): Promise<void> {
     await apiFetch(`/orders/${id}`, { method: 'DELETE' });
+}
+
+// ============================================================================
+// RENDELÉSEK (PUBLIKUS - VÁSÁRLÓK SZÁMÁRA)
+// ============================================================================
+
+export interface CreateOrderItemInput {
+    termek_nev: string;
+    termek_ar: number;
+    mennyiseg: number;
+    tej: string;
+    cukor: string;
+}
+
+export interface CreateOrderInput {
+    vevo_nev: string;
+    telefon: string;
+    email: string;
+    iranyitoszam: string;
+    telepules: string;
+    utca_hazszam: string;
+    items: CreateOrderItemInput[];
+}
+
+/**
+ * Új rendelés létrehozása (Publikus - vásárlók számára)
+ */
+export async function createOrder(order: CreateOrderInput): Promise<ApiOrder> {
+    return apiFetch<ApiOrder>('/orders', {
+        method: 'POST',
+        body: JSON.stringify(order)
+    });
 }

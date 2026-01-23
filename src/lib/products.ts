@@ -39,10 +39,10 @@ import type { Product } from './types';
  * ```
  */
 export const products: Product[] = [
-    { id: 1, name: 'Cappuccino', price: 850,},
-    { id: 2, name: 'Espresso', price: 650},
-    { id: 3, name: 'Ristretto', price: 850},
-    { id: 4, name: 'Latte', price: 900},
-    { id: 5, name: 'Americano', price: 700},
-    { id: 6, name: 'Doppio', price: 800}
+    { id: 'a1b2c3d4', name: 'Cappuccino', price: 850, image: '/images/cappuccino.jpg' },
+    { id: 'b2c3d4e5', name: 'Espresso', price: 650, image: '/images/espresso.webp' },
+    { id: 'c3d4e5f6', name: 'Ristretto', price: 850, image: '/images/ristretto.jpg' },
+    { id: 'd4e5f6a7', name: 'Latte', price: 900, image: '/images/latte.jpg' },
+    { id: 'e5f6a7b8', name: 'Americano', price: 700, image: '/images/americano.jpg' },
+    { id: 'f6a7b8c9', name: 'Doppio', price: 800, image: '/images/doppio.webp' }
 ];

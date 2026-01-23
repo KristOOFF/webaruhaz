@@ -1,5 +1,10 @@
 const Database = require('better-sqlite3');
 const path = require('path');
+const crypto = require('crypto');
+
+function generateId() {
+    return crypto.randomBytes(4).toString('hex');
+}
 
 const dbPath = path.join(__dirname, 'webaruhaz.db');
 const db = new Database(dbPath);
@@ -128,19 +133,21 @@ const testOrders = [
 
 // SQL statements
 const insertOrder = db.prepare(`
-  INSERT INTO rendelesek (vevo_nev, telefon, email, iranyitoszam, telepules, utca_hazszam, megrendelve, postazva, postazva_datum)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  INSERT INTO rendelesek (id, vevo_nev, telefon, email, iranyitoszam, telepules, utca_hazszam, megrendelve, postazva, postazva_datum)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `);
 
 const insertItem = db.prepare(`
-  INSERT INTO rendeles_tetelek (rendeles_id, termek_nev, termek_ar, mennyiseg, tej, cukor)
-  VALUES (?, ?, ?, ?, ?, ?)
+  INSERT INTO rendeles_tetelek (id, rendeles_id, termek_nev, termek_ar, mennyiseg, tej, cukor)
+  VALUES (?, ?, ?, ?, ?, ?, ?)
 `);
 
 // Transaction
 const insertAll = db.transaction(() => {
   for (const order of testOrders) {
-    const result = insertOrder.run(
+    const orderId = generateId();
+    insertOrder.run(
+      orderId,
       order.vevo_nev,
       order.telefon,
       order.email,
@@ -152,11 +159,12 @@ const insertAll = db.transaction(() => {
       order.postazva_datum || null
     );
 
-    const orderId = result.lastInsertRowid;
     console.log(`Rendelés hozzáadva: #${orderId} - ${order.vevo_nev} (${order.telepules})`);
 
     for (const item of order.tetelek) {
+      const itemId = generateId();
       insertItem.run(
+        itemId,
         orderId,
         item.termek_nev,
         item.termek_ar,
