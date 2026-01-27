@@ -101,8 +101,9 @@ A NeoCoffee egy kávé webáruház, amely lehetővé teszi a felhasználók szá
 - **bcrypt** - Jelszó hash-elés
 - **jsonwebtoken** - JWT token kezelés
 
-### Build Tools
+### Build & Test
 - **Vite 7.2.6** - Gyors build tool és dev szerver
+- **Vitest** - Unit és integrációs tesztek
 
 ## Telepítés
 
@@ -168,6 +169,44 @@ npm run db:check   # Adatbázis ellenőrzése
 npm run db:seed    # Tesztadatok hozzáadása
 ```
 
+### Tesztelés
+
+#### Unit tesztek futtatása
+
+```bash
+npm run test
+```
+
+#### Backend integrációs tesztek futtatása
+
+A backend tesztekhez először el kell indítani a szervert egy külön terminálban:
+
+```bash
+# 1. terminál - szerver indítása
+npm run server
+
+# 2. terminál - tesztek futtatása
+npm run test:server
+```
+
+#### Összes parancs
+
+```bash
+npm run test          # Unit tesztek (utils, cart, api)
+npm run test:watch    # Tesztek figyelő módban (változáskor újrafut)
+npm run test:server   # Backend integrációs tesztek
+npm run test:all      # Összes teszt egyben
+```
+
+#### Teszt fájlok
+
+| Fájl | Tesztek | Leírás |
+|------|---------|--------|
+| `tests/utils.test.ts` | 59 | Validációs függvények (email, telefon, irányítószám, település, cím) |
+| `tests/cart.test.ts` | 15 | Kosár store, addToCart, cartTotal |
+| `tests/api.test.ts` | 16 | Token kezelés, API hívások |
+| `tests/server.test.ts` | ~20 | Backend API végpontok (integrációs) |
+
 ## Projekt Struktúra
 
 ```
@@ -183,12 +222,22 @@ webaruhaz/
 │   │   ├── orders.ts            # Rendelések store
 │   │   ├── products.ts          # Termék adatok
 │   │   ├── theme.ts             # Téma store
-│   │   └── types.ts             # TypeScript típusok
+│   │   ├── types.ts             # TypeScript típusok
+│   │   └── utils.ts             # Validációs függvények
 │   └── routes/
 │       ├── +page.svelte         # Főoldal
+│       ├── +layout.svelte       # Gyökér layout
 │       ├── checkout/+page.svelte # Pénztár
 │       └── admin/+page.svelte   # Admin felület
+├── static/
+│   └── images/                  # Termék képek
+├── tests/                       # Tesztek
+│   ├── utils.test.ts            # Validációs tesztek
+│   ├── cart.test.ts             # Kosár tesztek
+│   ├── api.test.ts              # API kliens tesztek
+│   └── server.test.ts           # Backend integrációs tesztek
 ├── server.cjs                   # Express backend szerver
+├── vitest.config.ts             # Vitest konfiguráció
 ├── schema.sql                   # Adatbázis séma
 ├── webaruhaz.db                 # SQLite adatbázis
 ├── package.json

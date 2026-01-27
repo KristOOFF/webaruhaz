@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run test)",
+      "Bash(ls:*)",
+      "Bash(dir /b c:projectswebaruhaz*.md)"
+    ]
+  }
+}

@@ -9,27 +9,25 @@
 ```json
 [
   {
-    "id": 1,
+    "id": "a1b2c3d4",
     "nev": "Cappuccino",
     "ar": 850,
-    "kep_url": null,
+    "kep_url": "/images/cappuccino.jpg"
   }
 ]
 ```
 
 ### `GET /api/products/:id`
-Egy termék listázása.
+Egy termék lekérdezése.
 
 **Válasz:**
 ```json
-[
-  {
-    "id": 1,
-    "nev": "Cappuccino",
-    "ar": 850,
-    "kep_url": null,
-  }
-]
+{
+  "id": "a1b2c3d4",
+  "nev": "Cappuccino",
+  "ar": 850,
+  "kep_url": "/images/cappuccino.jpg"
+}
 ```
 
 ### `POST /api/products`
@@ -52,7 +50,17 @@ Termék módosítása (Admin).
 {
   "nev": "Cappuccino",
   "ar": 900,
-  "kep_url": null
+  "kep_url": "/images/cappuccino.jpg"
+}
+```
+
+### `DELETE /api/products/:id`
+Termék törlése (Admin).
+
+**Válasz:**
+```json
+{
+  "message": "Termék sikeresen törölve"
 }
 ```
 
@@ -69,7 +77,7 @@ Termék módosítása (Admin).
 ```json
 [
   {
-    "id": 1001,
+    "id": "abc12345",
     "vevo_nev": "Kovács János",
     "telefon": "+36 30 123 4567",
     "email": "kovacs.janos@example.com",
@@ -81,8 +89,8 @@ Termék módosítása (Admin).
     "postazva_datum": null,
     "items": [
       {
-        "id": 1,
-        "rendeles_id": 1001,
+        "id": "def67890",
+        "rendeles_id": "abc12345",
         "termek_nev": "Cappuccino",
         "termek_ar": 850,
         "mennyiseg": 2,
@@ -95,12 +103,12 @@ Termék módosítása (Admin).
 ```
 
 ### `GET /api/orders/:id`
-Egy adott rendelés részletei (Admin vagy saját rendelés esetén email alapján).
+Egy adott rendelés részletei (Admin).
 
 **Válasz:**
 ```json
 {
-  "id": 1001,
+  "id": "abc12345",
   "vevo_nev": "Kovács János",
   "telefon": "+36 30 123 4567",
   "email": "kovacs.janos@example.com",
@@ -112,8 +120,8 @@ Egy adott rendelés részletei (Admin vagy saját rendelés esetén email alapj�
   "postazva_datum": null,
   "items": [
     {
-      "id": 1,
-      "rendeles_id": 1001,
+      "id": "def67890",
+      "rendeles_id": "abc12345",
       "termek_nev": "Cappuccino",
       "termek_ar": 850,
       "mennyiseg": 2,
@@ -137,7 +145,7 @@ Rendelés postázási státuszának módosítása (Admin).
 **Válasz:**
 ```json
 {
-  "id": 1001,
+  "id": "abc12345",
   "postazva": 1,
   "postazva_datum": "2026-01-14T14:20:00Z"
 }
@@ -145,6 +153,64 @@ Rendelés postázási státuszának módosítása (Admin).
 
 ### `DELETE /api/orders/:id`
 Rendelés törlése (Admin).
+
+**Válasz:**
+```json
+{
+  "message": "Rendelés sikeresen törölve"
+}
+```
+
+### `POST /api/orders`
+Új rendelés létrehozása (Publikus - vásárlók számára).
+
+**Request:**
+```json
+{
+  "vevo_nev": "Kovács János",
+  "telefon": "+36 30 123 4567",
+  "email": "kovacs.janos@example.com",
+  "iranyitoszam": "1111",
+  "telepules": "Budapest",
+  "utca_hazszam": "Kossuth Lajos utca 12",
+  "items": [
+    {
+      "termek_nev": "Cappuccino",
+      "termek_ar": 850,
+      "mennyiseg": 2,
+      "tej": "Cow",
+      "cukor": "1 spoon"
+    }
+  ]
+}
+```
+
+**Válasz (201 Created):**
+```json
+{
+  "id": "abc12345",
+  "vevo_nev": "Kovács János",
+  "telefon": "+36 30 123 4567",
+  "email": "kovacs.janos@example.com",
+  "iranyitoszam": "1111",
+  "telepules": "Budapest",
+  "utca_hazszam": "Kossuth Lajos utca 12",
+  "megrendelve": "2026-01-14T10:30:00Z",
+  "postazva": 0,
+  "postazva_datum": null,
+  "items": [
+    {
+      "id": "def67890",
+      "rendeles_id": "abc12345",
+      "termek_nev": "Cappuccino",
+      "termek_ar": 850,
+      "mennyiseg": 2,
+      "tej": "Cow",
+      "cukor": "1 spoon"
+    }
+  ]
+}
+```
 
 ---
 
@@ -166,7 +232,7 @@ Admin bejelentkezés.
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "admin": {
-    "id": 1,
+    "id": "a1b2c3d4",
     "felhasznalonev": "admin",
     "letrehozva": "2026-01-14T10:00:00Z"
   }
@@ -196,7 +262,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 {
   "valid": true,
   "admin": {
-    "id": 1,
+    "id": "a1b2c3d4",
     "felhasznalonev": "admin"
   }
 }

@@ -21,9 +21,10 @@ Egy kávétermék alapvető adatstruktúrája.
 
 ```typescript
 interface Product {
-  id: number;
+  id: string;
   name: string;
   price: number;
+  image?: string | null;
 }
 ```
 
@@ -31,17 +32,19 @@ interface Product {
 
 | Mező | Típus | Leírás |
 |------|-------|--------|
-| `id` | `number` | A termék egyedi azonosítója |
+| `id` | `string` | A termék egyedi azonosítója (8 karakteres hex) |
 | `name` | `string` | A termék megjelenítési neve (pl. "Cappuccino") |
 | `price` | `number` | A termék ára magyar forintban |
+| `image` | `string \| null` | A termék képének URL-je (opcionális) |
 
 **Példa**:
 
 ```typescript
 const product: Product = {
-  id: 1,
+  id: 'a1b2c3d4',
   name: 'Cappuccino',
   price: 850,
+  image: '/images/cappuccino.jpg'
 };
 ```
 
@@ -64,15 +67,15 @@ interface Modifiers {
 
 | Mező | Típus | Leírás | Lehetséges értékek |
 |------|-------|--------|-------------------|
-| `milk` | `string` | Választott tej típus | "Mandula tej", "Tehéntej", "Zabtej" |
-| `sugar` | `string` | Cukor mennyiség | "Cukor mennyiség" (default), "Nincs", "1 kanál", "2 kanál" |
+| `milk` | `string` | Választott tej típus | "Almond", "Cow", "Oat" |
+| `sugar` | `string` | Cukor mennyiség | "None", "1 spoon", "2 spoons" |
 
 **Példa**:
 
 ```typescript
 const modifiers: Modifiers = {
-  milk: 'Zabtej',
-  sugar: '1 kanál'
+  milk: 'Oat',
+  sugar: '1 spoon'
 };
 ```
 
@@ -102,16 +105,104 @@ interface CartItem extends Product {
 
 ```typescript
 const cartItem: CartItem = {
-  id: 1,
+  id: 'a1b2c3d4',
   name: 'Cappuccino',
   price: 850,
   quantity: 2,
   modifiers: {
-    milk: 'Zabtej',
-    sugar: '1 kanál'
+    milk: 'Oat',
+    sugar: '1 spoon'
   }
 };
 ```
+
+---
+
+### `OrderItem`
+
+Egy rendelésben található termék adatai.
+
+**Fájl**: [`src/lib/types.ts`](src/lib/types.ts)
+
+```typescript
+interface OrderItem {
+  name: string;
+  quantity: number;
+  price: number;
+  modifiers: Modifiers;
+}
+```
+
+**Mezők**:
+
+| Mező | Típus | Leírás |
+|------|-------|--------|
+| `name` | `string` | A termék neve |
+| `quantity` | `number` | A rendelt mennyiség |
+| `price` | `number` | A termék ára |
+| `modifiers` | `Modifiers` | A termékhez választott módosítások |
+
+---
+
+### `Address`
+
+A vásárló szállítási címének adatai.
+
+**Fájl**: [`src/lib/types.ts`](src/lib/types.ts)
+
+```typescript
+interface Address {
+  zip: string;
+  city: string;
+  street: string;
+  house: string;
+}
+```
+
+**Mezők**:
+
+| Mező | Típus | Leírás |
+|------|-------|--------|
+| `zip` | `string` | Irányítószám |
+| `city` | `string` | Város |
+| `street` | `string` | Utca |
+| `house` | `string` | Házszám |
+
+---
+
+### `Order`
+
+Egy teljes rendelés összes adata az admin felület számára.
+
+**Fájl**: [`src/lib/types.ts`](src/lib/types.ts)
+
+```typescript
+interface Order {
+  id: string;
+  customerName: string;
+  email: string;
+  phone: string;
+  address: Address;
+  orderDate: string;
+  shipped: boolean;
+  shippedDate: string | null;
+  items: OrderItem[];
+}
+```
+
+**Mezők**:
+
+| Mező | Típus | Leírás |
+|------|-------|--------|
+| `id` | `string` | A rendelés egyedi azonosítója |
+| `customerName` | `string` | A vásárló neve |
+| `email` | `string` | A vásárló email címe |
+| `phone` | `string` | A vásárló telefonszáma |
+| `address` | `Address` | A szállítási cím |
+| `orderDate` | `string` | A rendelés dátuma (ISO formátum) |
+| `shipped` | `boolean` | Postázási státusz |
+| `shippedDate` | `string \| null` | A postázás dátuma |
+| `items` | `OrderItem[]` | A rendelés tételei |
 
 ---
 
@@ -345,6 +436,24 @@ Téma dekorációk komponens - csillagok és felhők.
 ---
 
 ## Utility Függvények
+
+### Validációs függvények
+
+**Fájl**: [`src/lib/utils.ts`](src/lib/utils.ts)
+
+A checkout űrlap mezőinek validálására szolgáló függvények.
+
+| Függvény | Leírás |
+|----------|--------|
+| `validateEmail(email)` | Email cím formátum ellenőrzése |
+| `validatePhone(phone)` | Magyar telefonszám formátum ellenőrzése (+36/06 + 20/30/70 + 7 számjegy) |
+| `validateZip(zip)` | Irányítószám ellenőrzése (4 számjegy) |
+| `validateCity(city)` | Település név ellenőrzése (magyar ékezetes betűk) |
+| `validateStreet(street)` | Cím ellenőrzése (utca, házszám) |
+
+**Hibaüzenetek**: A `validationErrors` objektum tartalmazza a magyar nyelvű hibaüzeneteket.
+
+---
 
 ### `addToCart`
 

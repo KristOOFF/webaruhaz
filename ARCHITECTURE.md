@@ -519,6 +519,7 @@ DELETE /api/products/:id     - Termék törlése (Admin)
 
 GET  /api/orders             - Rendelések listázása (Admin)
 GET  /api/orders/:id         - Rendelés részletei (Admin)
+POST /api/orders             - Új rendelés (Publikus)
 PATCH /api/orders/:id/ship   - Postázás státusz (Admin)
 DELETE /api/orders/:id       - Rendelés törlése (Admin)
 

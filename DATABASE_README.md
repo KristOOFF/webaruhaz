@@ -26,13 +26,10 @@ Tartalmazza az összes elérhető kávéterméket.
 
 | Mező | Típus | Megszorítás | Leírás |
 |------|-------|-------------|--------|
-| `id` | INTEGER | PRIMARY KEY, AUTOINCREMENT | Egyedi azonosító |
+| `id` | TEXT | PRIMARY KEY | Egyedi azonosító (8 karakteres hex) |
 | `nev` | TEXT | NOT NULL | Termék neve (pl. "Cappuccino") |
 | `ar` | INTEGER | NOT NULL | Termék ára (Ft) |
 | `kep_url` | TEXT | - | Termék kép URL-je (opcionális) |
-
-**Indexek**:
-- `idx_termekek_tipus` - Gyors szűrés típus szerint
 
 #### 2. `rendelesek` - Vásárlói rendelések
 
@@ -40,7 +37,7 @@ A vásárlói rendelések fő adatait tartalmazza.
 
 | Mező | Típus | Megszorítás | Leírás |
 |------|-------|-------------|--------|
-| `id` | INTEGER | PRIMARY KEY, AUTOINCREMENT | Egyedi rendelésazonosító |
+| `id` | TEXT | PRIMARY KEY | Egyedi rendelésazonosító (8 karakteres hex) |
 | `vevo_nev` | TEXT | NOT NULL | Vevő teljes neve |
 | `telefon` | TEXT | NOT NULL | Vevő telefonszáma |
 | `email` | TEXT | NOT NULL | Vevő email címe |
@@ -48,7 +45,7 @@ A vásárlói rendelések fő adatait tartalmazza.
 | `telepules` | TEXT | NOT NULL | Szállítási cím - település |
 | `utca_hazszam` | TEXT | NOT NULL | Szállítási cím - utca és házszám |
 | `megrendelve` | TEXT | DEFAULT CURRENT_TIMESTAMP | Rendelés leadásának dátuma/ideje |
-| `postazva` | INTEGER | DEFAULT 0, CHECK(0 or 1) | Postázási státusz (0=nem, 1=igen) |
+| `postazva` | INTEGER | DEFAULT 0, CHECK(IN (0, 1)) | Postázási státusz (0=nem, 1=igen) |
 | `postazva_datum` | TEXT | - | Postázás dátuma (NULL ha még nincs postázva) |
 
 **Indexek**:
@@ -62,15 +59,15 @@ A rendelésekhez tartozó termékek részleteit tartalmazza, módosítókkal egy
 
 | Mező | Típus | Megszorítás | Leírás |
 |------|-------|-------------|--------|
-| `id` | INTEGER | PRIMARY KEY, AUTOINCREMENT | Egyedi tétel azonosító |
-| `rendeles_id` | INTEGER | NOT NULL, FOREIGN KEY | Kapcsolódó rendelés ID |
+| `id` | TEXT | PRIMARY KEY | Egyedi tétel azonosító (8 karakteres hex) |
+| `rendeles_id` | TEXT | NOT NULL, FOREIGN KEY | Kapcsolódó rendelés ID |
 | `termek_nev` | TEXT | NOT NULL | Termék neve (snapshot) |
 | `termek_ar` | INTEGER | NOT NULL | Termék ára a rendeléskor (snapshot) |
 | `mennyiseg` | INTEGER | NOT NULL | Rendelt mennyiség |
 | `tej` | TEXT | NOT NULL | Választott tej típusa |
 | `cukor` | TEXT | NOT NULL | Választott cukor mennyiség |
 
-**Foreign Key**: `rendeles_id` → `rendelesek(id)` CASCADE DELETE
+**Foreign Key**: `rendeles_id` → `rendelesek(id)` ON DELETE CASCADE
 
 **Indexek**:
 - `idx_rendeles_tetelek_rendeles_id` - Gyors rendelésenkénti szűrés
@@ -83,7 +80,7 @@ Admin felhasználók autentikációs adatai.
 
 | Mező | Típus | Megszorítás | Leírás |
 |------|-------|-------------|--------|
-| `id` | INTEGER | PRIMARY KEY, AUTOINCREMENT | Egyedi felhasználói azonosító |
+| `id` | TEXT | PRIMARY KEY | Egyedi felhasználói azonosító (8 karakteres hex) |
 | `felhasznalonev` | TEXT | NOT NULL, UNIQUE | Admin felhasználónév |
 | `jelszo_hash` | TEXT | NOT NULL | Bcrypt hash-elt jelszó |
 | `letrehozva` | TEXT | DEFAULT CURRENT_TIMESTAMP | Felhasználó létrehozásának dátuma |
