@@ -118,6 +118,28 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /*
+   * Globális téma-tranzició.
+   *
+   * Probléma: a shadcn komponensek (Card, Input, Table stb.) és a `.glass*`
+   * utility-k CSS változókkal (--background, --card, --border ...) színeznek.
+   * Amikor a `.dark` osztály felkerül a <html>-re, ezek a változók azonnal
+   * átváltanak, és minden olyan elem, ami nem kapott explicit
+   * `transition-colors`-t, "ugorva" frissül -> apró villogás a glassmorphism
+   * háttérnél vagy a Card határoknál.
+   *
+   * Megoldás: minden elemre alapból ráteszünk egy 300ms-os szín-tranziciót.
+   * A `:where()` szelektor 0 specifikusságú, így bármelyik Tailwind
+   * `transition-*` / `duration-*` osztály felülírja (pl. button hover 200ms).
+   */
+  :where(*),
+  :where(*)::before,
+  :where(*)::after {
+    transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+    transition-duration: 300ms;
+    transition-timing-function: ease-in-out;
+  }
 }
 
 /* Glassmorphism utility classes */

@@ -47,66 +47,6 @@ export interface CartItem extends Product {
     modifiers: Modifiers;
 }
 
-/**
- * Rendelés tétel interfész
- *
- * Egy rendelésben található termék adatait tartalmazza.
- *
- * @interface OrderItem
- * @property {string} name - A termék neve
- * @property {number} quantity - A rendelt mennyiség
- * @property {number} price - A termék ára
- * @property {Modifiers} modifiers - A termékhez választott módosítások
- */
-export interface OrderItem {
-    name: string;
-    quantity: number;
-    price: number;
-    modifiers: Modifiers;
-}
-
-/**
- * Cím interfész
- *
- * A vásárló szállítási címének adatait tartalmazza.
- *
- * @interface Address
- * @property {string} zip - Irányítószám
- * @property {string} city - Város
- * @property {string} street - Utca
- * @property {string} house - Házszám
- */
-export interface Address {
-    zip: string;
-    city: string;
-    street: string;
-    house: string;
-}
-
-/**
- * Rendelés interfész
- *
- * Egy teljes rendelés összes adatát tartalmazza az admin felület számára.
- *
- * @interface Order
- * @property {string} id - A rendelés egyedi azonosítója (GUID)
- * @property {string} customerName - A vásárló neve
- * @property {string} email - A vásárló email címe
- * @property {string} phone - A vásárló telefonszáma
- * @property {Address} address - A szállítási cím
- * @property {string} orderDate - A rendelés dátuma (ISO formátum)
- * @property {boolean} shipped - Postázási státusz (true = postázva, false = még nem postázva)
- * @property {string | null} shippedDate - A postázás dátuma (ISO formátum, vagy null ha még nem postázva)
- * @property {OrderItem[]} items - A rendelés tételei
- */
-export interface Order {
-    id: string;
-    customerName: string;
-    email: string;
-    phone: string;
-    address: Address;
-    orderDate: string;
-    shipped: boolean;
-    shippedDate: string | null;
-    items: OrderItem[];
-}
+// Megjegyzés: a rendelésekkel kapcsolatos típusok (ApiOrder, OrderItem,
+// CreateOrderInput stb.) a backend séma szerint a `src/lib/api.ts`-ben
+// vannak definiálva, és onnan importálandók.

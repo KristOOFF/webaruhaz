@@ -9,8 +9,15 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { isDarkMode } from '$lib/theme';
-  import { Sun, Moon, ArrowLeft, Package, Trash2, Eye, LogIn, LogOut } from '@lucide/svelte';
+  // Per-ikonos import: jelentősen gyorsabb dev navigáció (nem húzza be az összes Lucide ikont)
+  import ArrowLeft from '@lucide/svelte/icons/arrow-left';
+  import Package from '@lucide/svelte/icons/package';
+  import Trash2 from '@lucide/svelte/icons/trash-2';
+  import Eye from '@lucide/svelte/icons/eye';
+  import LogIn from '@lucide/svelte/icons/log-in';
+  import LogOut from '@lucide/svelte/icons/log-out';
   import ThemeDecorations from '$lib/components/ThemeDecorations.svelte';
+  import ThemeToggleIcon from '$lib/components/ThemeToggleIcon.svelte';
   import * as api from '$lib/api';
   import type { ApiOrder } from '$lib/api';
 
@@ -168,7 +175,7 @@
 </script>
 
 <!-- Main Container -->
-<div class="min-h-screen relative overflow-hidden font-sans transition-colors duration-700
+<div class="min-h-screen relative overflow-hidden font-sans transition-colors duration-300
   bg-gradient-to-br from-slate-700 via-slate-600 to-slate-500
   dark:bg-gradient-to-br dark:from-[#0d0e1a] dark:via-[#0d0e1a] dark:to-[#0d0e1a]">
 
@@ -207,11 +214,7 @@
       {/if}
       <Button variant="default" size="icon" onclick={toggleTheme}>
         {#snippet children()}
-          {#if $isDarkMode}
-            <Sun size={20} class="text-yellow-400" />
-          {:else}
-            <Moon size={20} />
-          {/if}
+          <ThemeToggleIcon size={20} />
         {/snippet}
       </Button>
     </div>
@@ -301,7 +304,7 @@
                   <Select.Root type="single" bind:value={statusFilter}>
                     <Select.Trigger size="sm" class="h-5 px-1.5 text-[10px] w-auto min-w-0">
                       {#snippet children()}
-                        <Select.Value placeholder="Mind" />
+                        {statusFilter === 'all' ? 'Mind' : statusFilter === 'pending' ? 'Folyamatban' : 'Kiszállítva'}
                       {/snippet}
                     </Select.Trigger>
                     <Select.Content>

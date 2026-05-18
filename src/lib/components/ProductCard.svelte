@@ -21,7 +21,10 @@
   ```
 -->
 <script lang="ts">
-  import { Coffee, Minus, Plus } from '@lucide/svelte';
+  // Per-ikonos import: jelentősen gyorsabb dev build (nem húzza be az összes Lucide ikont)
+  import Coffee from '@lucide/svelte/icons/coffee';
+  import Minus from '@lucide/svelte/icons/minus';
+  import Plus from '@lucide/svelte/icons/plus';
   import { addToCart } from '$lib/cart';
   import type { Product } from '$lib/types';
 

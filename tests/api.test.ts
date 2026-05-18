@@ -12,7 +12,6 @@ import {
     clearToken,
     isLoggedIn,
     getProducts,
-    getProduct,
     createOrder,
     type ApiProduct,
     type CreateOrderInput
@@ -160,40 +159,6 @@ describe('Products API', () => {
             });
 
             await expect(getProducts()).rejects.toThrow('Szerver hiba');
-        });
-    });
-
-    describe('getProduct', () => {
-        it('lekér egy terméket ID alapján', async () => {
-            mockFetch.mockResolvedValueOnce({
-                ok: true,
-                json: async () => mockApiProducts[0]
-            });
-
-            const product = await getProduct('001');
-
-            expect(mockFetch).toHaveBeenCalledWith(
-                'http://localhost:3000/api/products/001',
-                expect.any(Object)
-            );
-
-            expect(product).toEqual({
-                id: '001',
-                name: 'Cappuccino',
-                price: 850,
-                image: '/images/cappuccino.webp'
-            });
-        });
-
-        it('null kép értéket is helyesen kezeli', async () => {
-            mockFetch.mockResolvedValueOnce({
-                ok: true,
-                json: async () => mockApiProducts[2] // Latte, nincs képe
-            });
-
-            const product = await getProduct('003');
-
-            expect(product.image).toBeNull();
         });
     });
 });

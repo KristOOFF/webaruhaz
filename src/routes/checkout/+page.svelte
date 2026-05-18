@@ -42,9 +42,12 @@
   - **Reszponzív**: Mobil-first megközelítés
 -->
 <script lang="ts">
-  import { Sun, Moon, ArrowLeft, ShoppingCart } from '@lucide/svelte';
+  // Per-ikonos import: jelentősen gyorsabb dev navigáció (nem húzza be az összes Lucide ikont)
+  import ArrowLeft from '@lucide/svelte/icons/arrow-left';
+  import ShoppingCart from '@lucide/svelte/icons/shopping-cart';
   import { isDarkMode } from '$lib/theme';
   import ThemeDecorations from '$lib/components/ThemeDecorations.svelte';
+  import ThemeToggleIcon from '$lib/components/ThemeToggleIcon.svelte';
   import { cartItems, cartTotal } from '$lib/cart';
   import { createOrder } from '$lib/api';
   import type { CreateOrderInput } from '$lib/api';
@@ -379,7 +382,7 @@
 </script>
 
 <!-- Main Container -->
-<div class="min-h-screen relative overflow-hidden font-sans transition-colors duration-700
+<div class="min-h-screen relative overflow-hidden font-sans transition-colors duration-300
   bg-gradient-to-br from-slate-700 via-slate-600 to-slate-500
   dark:bg-gradient-to-br dark:from-[#0d0e1a] dark:via-[#0d0e1a] dark:to-[#0d0e1a]">
 
@@ -388,9 +391,22 @@
 
   <!-- HEADER -->
   <header class="flex justify-center items-center py-8 relative px-4 z-20 max-w-7xl mx-auto">
-    <!-- Back Button -->
+    <!--
+      Vissza- és témaváltó gomb. A shadcn `outline` variant `bg-background`-et
+      használ (világos módban fehér, sötétben közel fekete) és `duration-200`
+      tranzicióval animalódik, ami a 700ms-os háttérrel "villogás" hatást adott.
+      Ehelyett ugyanazt az üvegmézes stílust + 700ms tranziciót használjuk.
+    -->
     <div class="absolute left-4 top-8">
-      <Button variant="outline" size="icon" href="/">
+      <Button
+        href="/"
+        size="icon"
+        class="w-10 h-10 backdrop-blur-xl border bg-white/20 border-white/30 text-gray-800
+               dark:bg-white/[0.03] dark:border-white/[0.08] dark:text-white
+               hover:bg-white/30 dark:hover:bg-white/[0.06]
+               shadow-lg dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)]
+               transition-colors duration-300"
+      >
         {#snippet children()}
           <ArrowLeft size={20} />
         {/snippet}
@@ -407,13 +423,17 @@
 
     <!-- Theme Toggle Button -->
     <div class="absolute right-4 top-8">
-      <Button variant="outline" size="icon" onclick={toggleTheme}>
+      <Button
+        onclick={toggleTheme}
+        size="icon"
+        class="w-10 h-10 backdrop-blur-xl border bg-white/20 border-white/30 text-gray-800
+               dark:bg-white/[0.03] dark:border-white/[0.08] dark:text-white
+               hover:bg-white/30 dark:hover:bg-white/[0.06]
+               shadow-lg dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)]
+               transition-colors duration-300"
+      >
         {#snippet children()}
-          {#if $isDarkMode}
-            <Sun size={20} class="text-yellow-400" />
-          {:else}
-            <Moon size={20} />
-          {/if}
+          <ThemeToggleIcon size={20} />
         {/snippet}
       </Button>
     </div>

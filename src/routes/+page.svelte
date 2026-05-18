@@ -29,7 +29,11 @@
   import { isDarkMode } from '$lib/theme';
   import ProductCard from '$lib/components/ProductCard.svelte';
   import ThemeDecorations from '$lib/components/ThemeDecorations.svelte';
-  import { Coffee, Sun, Moon, Shield, ShoppingCart } from '@lucide/svelte';
+  import ThemeToggleIcon from '$lib/components/ThemeToggleIcon.svelte';
+  // Per-ikonos import: jelentősen gyorsabb dev build (nem húzza be az összes Lucide ikont)
+  import Coffee from '@lucide/svelte/icons/coffee';
+  import Shield from '@lucide/svelte/icons/shield';
+  import ShoppingCart from '@lucide/svelte/icons/shopping-cart';
   import type { PageData } from './+page';
 
   // shadcn-svelte komponensek
@@ -49,7 +53,7 @@
 </script>
 
 <!-- Main Container: Transition between Light and Dark -->
-<div class="min-h-screen relative overflow-hidden font-sans transition-colors duration-700
+<div class="min-h-screen relative overflow-hidden font-sans transition-colors duration-300
   bg-gradient-to-br from-slate-700 via-slate-600 to-slate-500
   dark:bg-gradient-to-br dark:from-[#0d0e1a] dark:via-[#0d0e1a] dark:to-[#0d0e1a]">
 
@@ -66,21 +70,44 @@
       </Card.Content>
     </Card.Root>
 
-    <!-- Action Buttons -->
+    <!--
+      Akció gombok (Admin link + téma váltó).
+
+      Szándékosan NEM használjuk a shadcn `outline` variantot, mert az
+      `bg-background`-et használ (világos módban tiszta fehér, sötétben
+      majdnem fekete) és csak `duration-200` tranzícióval animálódik.
+      A fő háttér viszont `duration-700`-zal vált, így a gomb 500ms-mal
+      korábban végez → vizuálisan "villog".
+
+      Helyette ugyanazt az üvegmézes (glassmorphism) stílust adjuk a
+      gomboknak, mint a cím Card-nak, és minden szín-tranzíciót
+      `duration-700`-ra egységesítünk.
+    -->
     <div class="absolute right-4 top-8 sm:right-10 flex gap-2">
-      <Button variant="outline" size="default" class="h-10 px-4 gap-2" href="/admin">
+      <Button
+        href="/admin"
+        class="h-10 px-4 gap-2 backdrop-blur-xl border bg-white/20 border-white/30 text-gray-800
+               dark:bg-white/[0.03] dark:border-white/[0.08] dark:text-white
+               hover:bg-white/30 dark:hover:bg-white/[0.06]
+               shadow-lg dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)]
+               transition-colors duration-300"
+      >
         {#snippet children()}
           <Shield size={18} />
           <span class="text-sm font-medium">Admin</span>
         {/snippet}
       </Button>
-      <Button variant="outline" size="icon" class="w-10 h-10" onclick={toggleTheme}>
+      <Button
+        onclick={toggleTheme}
+        size="icon"
+        class="w-10 h-10 backdrop-blur-xl border bg-white/20 border-white/30 text-gray-800
+               dark:bg-white/[0.03] dark:border-white/[0.08] dark:text-white
+               hover:bg-white/30 dark:hover:bg-white/[0.06]
+               shadow-lg dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.4)]
+               transition-colors duration-300"
+      >
         {#snippet children()}
-          {#if $isDarkMode}
-            <Sun size={20} class="text-yellow-400" />
-          {:else}
-            <Moon size={20} />
-          {/if}
+          <ThemeToggleIcon size={20} />
         {/snippet}
       </Button>
     </div>

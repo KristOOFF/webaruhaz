@@ -155,12 +155,6 @@ export interface FrontendProduct {
     image?: string | null;
 }
 
-export interface ProductInput {
-    nev: string;
-    ar: number;
-    kep_url?: string;
-}
-
 /**
  * Összes termék lekérdezése
  * Átalakítja a backend formátumot frontend formátumra
@@ -175,48 +169,6 @@ export async function getProducts(): Promise<FrontendProduct[]> {
         price: product.ar,
         image: product.kep_url
     }));
-}
-
-/**
- * Egy termék lekérdezése
- * Átalakítja a backend formátumot frontend formátumra
- */
-export async function getProduct(id: string): Promise<FrontendProduct> {
-    const apiProduct = await apiFetch<ApiProduct>(`/products/${id}`);
-
-    return {
-        id: apiProduct.id,
-        name: apiProduct.nev,
-        price: apiProduct.ar,
-        image: apiProduct.kep_url
-    };
-}
-
-/**
- * Új termék létrehozása (Admin)
- */
-export async function createProduct(product: ProductInput): Promise<ApiProduct> {
-    return apiFetch<ApiProduct>('/products', {
-        method: 'POST',
-        body: JSON.stringify(product)
-    });
-}
-
-/**
- * Termék módosítása (Admin)
- */
-export async function updateProduct(id: string, product: Partial<ProductInput>): Promise<ApiProduct> {
-    return apiFetch<ApiProduct>(`/products/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(product)
-    });
-}
-
-/**
- * Termék törlése (Admin)
- */
-export async function deleteProduct(id: string): Promise<void> {
-    await apiFetch(`/products/${id}`, { method: 'DELETE' });
 }
 
 // ============================================================================
@@ -262,13 +214,6 @@ export async function getOrders(params?: OrdersQueryParams): Promise<ApiOrder[]>
 
     const queryString = query.toString();
     return apiFetch<ApiOrder[]>(`/orders${queryString ? `?${queryString}` : ''}`);
-}
-
-/**
- * Egy rendelés lekérdezése (Admin)
- */
-export async function getOrder(id: string): Promise<ApiOrder> {
-    return apiFetch<ApiOrder>(`/orders/${id}`);
 }
 
 /**
